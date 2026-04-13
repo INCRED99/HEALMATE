@@ -22,16 +22,25 @@ class RecordsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.appointment1.setOnClickListener {
-            Toast.makeText(context, "Opening Kingsway Hospital details...", Toast.LENGTH_SHORT).show()
+            showAppointmentDetails("Kingsway Hospital", "Sep 10, 2023", "Dr. Amit Patil", "Regular Checkup", "Everything is normal. Advised to stay hydrated.")
         }
 
         binding.appointment2.setOnClickListener {
-            Toast.makeText(context, "Opening Care Hospital details...", Toast.LENGTH_SHORT).show()
+            showAppointmentDetails("Care Hospital", "Aug 05, 2023", "Dr. Snehal Kulkarni", "Fever", "Diagnosed with viral fever. Prescribed rest and antibiotics.")
         }
 
         binding.appointment3.setOnClickListener {
-            Toast.makeText(context, "Opening Orange City Hospital details...", Toast.LENGTH_SHORT).show()
+            showAppointmentDetails("Orange City Hospital", "June 20, 2023", "Dr. Vinay Deshpande", "Fracture Follow-up", "Bone healing well. Suggested light exercises.")
         }
+    }
+
+    private fun showAppointmentDetails(hospital: String, date: String, doctor: String, reason: String, notes: String) {
+        val message = "Hospital: $hospital\nDate: $date\nDoctor: $doctor\nReason: $reason\n\nNotes: $notes"
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Appointment Details")
+            .setMessage(message)
+            .setPositiveButton("Close", null)
+            .show()
     }
 
     override fun onDestroyView() {

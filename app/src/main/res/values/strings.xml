@@ -66,6 +66,14 @@
     <string name="chat_hint">Type a message…</string>
     <string name="chat_send">Send</string>
 
+    <!-- Emergency Contact -->
+    <string name="emergency_contact_name_hint">Emergency Contact Name</string>
+    <string name="phone_number_hint">Phone Number</string>
+    <string name="edit_emergency_contact">Edit Emergency Contact</string>
+    <string name="emergency_updated">Emergency contact updated</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
