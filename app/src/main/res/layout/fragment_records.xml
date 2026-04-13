@@ -136,13 +136,46 @@
                     android:layout_marginBottom="12dp"
                     android:background="@color/divider" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/layout_past_appointments"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="1. Kingsway Hospital - Sep 10, 2023\n2. Care Hospital - Aug 05, 2023\n3. Orange City Hospital - June 20, 2023"
-                    android:textColor="@color/text_dark"
-                    android:lineSpacingMultiplier="1.4"
-                    android:textSize="14sp" />
+                    android:orientation="vertical">
+                    <!-- Past appointments will be added here or kept as clickable views -->
+                    <TextView
+                        android:id="@+id/appointment_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="1. Kingsway Hospital - Sep 10, 2023"
+                        android:textColor="@color/primary_medical"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/appointment_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="2. Care Hospital - Aug 05, 2023"
+                        android:textColor="@color/primary_medical"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/appointment_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:text="3. Orange City Hospital - June 20, 2023"
+                        android:textColor="@color/primary_medical"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:textSize="14sp" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -49,12 +49,14 @@ class RegisterFragment : Fragment() {
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
         val confirmPassword = binding.inputConfirmPassword.text.toString()
+        val emergencyContact = binding.inputEmergencyContact.text.toString().trim()
 
         // Reset errors
         binding.inputNameLayout.error = null
         binding.inputEmailLayout.error = null
         binding.inputPasswordLayout.error = null
         binding.inputConfirmPasswordLayout.error = null
+        binding.inputEmergencyContactLayout.error = null
 
         // Name validation
         if (name.isEmpty()) {
@@ -77,6 +79,13 @@ class RegisterFragment : Fragment() {
         if (!email.endsWith("gmail.com")) {
             binding.inputEmailLayout.error = getString(R.string.error_email_format)
             binding.inputEmail.requestFocus()
+            return false
+        }
+
+        // Emergency Contact validation (optional but good to have)
+        if (emergencyContact.isEmpty() && binding.radioPatient.isChecked) {
+            binding.inputEmergencyContactLayout.error = "Emergency contact is required for patients"
+            binding.inputEmergencyContact.requestFocus()
             return false
         }
 
@@ -106,6 +115,7 @@ class RegisterFragment : Fragment() {
         val name = binding.inputName.text.toString().trim()
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
+        val emergencyContact = binding.inputEmergencyContact.text.toString().trim()
         val isHospital = binding.radioHospital.isChecked
 
         val prefs = requireContext().getSharedPreferences("healmate_users", Context.MODE_PRIVATE)
@@ -121,16 +131,14 @@ class RegisterFragment : Fragment() {
         prefs.edit()
             .putString("user_${email}_password", password)
             .putString("user_${email}_name", name)
+            .putString("user_${email}_emergency", emergencyContact)
             .putBoolean("user_${email}_isHospital", isHospital)
             .apply()
 
         Toast.makeText(context, getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
 
-        // Navigate to home
-        val bundle = Bundle().apply {
-            putBoolean("isHospital", isHospital)
-        }
-        findNavController().navigate(R.id.action_RegisterFragment_to_FirstFragment, bundle)
+        // Redirect to Login Page
+        findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)
     }
 
     override fun onDestroyView() {
