@@ -12,10 +12,22 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="Upcoming Appointments"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/primary_medical"
+        android:textColor="@color/text_dark"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/text_appointments_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:text="Manage your patient appointments"
+        android:textSize="14sp"
+        android:textColor="@color/text_grey"
+        app:layout_constraintTop_toBottomOf="@id/text_appointments_title"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -24,10 +36,11 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/text_appointments_title"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/text_appointments_subtitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@android:layout/simple_list_item_2" />
+        tools:listitem="@layout/item_appointment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

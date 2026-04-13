@@ -8,11 +8,33 @@
     <fragment
         android:id="@+id/LoginFragment"
         android:name="com.example.thehealmate.LoginFragment"
-        android:label="Login"
+        android:label="Sign In"
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_LoginFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            app:destination="@id/FirstFragment"
+            app:popUpTo="@id/LoginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_LoginFragment_to_RegisterFragment"
+            app:destination="@id/RegisterFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/RegisterFragment"
+        android:name="com.example.thehealmate.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_RegisterFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment"
+            app:popUpTo="@id/LoginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_RegisterFragment_to_LoginFragment"
+            app:destination="@id/LoginFragment"
+            app:popUpTo="@id/RegisterFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

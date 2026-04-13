@@ -3,41 +3,70 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/text_patient_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Patient Name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary_medical" />
+        <!-- Appointment Icon -->
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_icon_circle">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_today"
+                app:tint="@color/primary_medical"
+                android:contentDescription="Appointment" />
+        </FrameLayout>
 
-        <TextView
-            android:id="@+id/text_appointment_details"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Date: 12/05/2024 | Time: 10:00 AM"
-            android:textColor="@color/text_grey" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="14dp">
 
-        <TextView
-            android:id="@+id/text_token"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Token: 4521"
-            android:textStyle="italic"
-            android:textColor="@color/primary_dark" />
+            <TextView
+                android:id="@+id/text_patient_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Patient Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_dark" />
+
+            <TextView
+                android:id="@+id/text_appointment_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Date: 12/05/2024 | Time: 10:00 AM"
+                android:textSize="13sp"
+                android:textColor="@color/text_grey" />
+
+            <TextView
+                android:id="@+id/text_token"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Token: 4521"
+                android:textStyle="italic"
+                android:textSize="12sp"
+                android:textColor="@color/primary_medical" />
+        </LinearLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

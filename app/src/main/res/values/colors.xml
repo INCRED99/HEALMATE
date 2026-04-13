@@ -2,13 +2,52 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary_medical">#00796B</color>
-    <color name="primary_light">#48A999</color>
-    <color name="primary_dark">#004C40</color>
-    <color name="secondary_medical">#FF6F00</color>
-    <color name="background_light">#F1F8E9</color>
-    <color name="text_dark">#212121</color>
-    <color name="text_grey">#616161</color>
-    <color name="error_red">#D32F2F</color>
+
+    <!-- Healthcare Blue Palette -->
+    <color name="primary_medical">#1565C0</color>
+    <color name="primary_light">#5E92F3</color>
+    <color name="primary_dark">#003C8F</color>
+    <color name="accent">#00BFA5</color>
+
+    <!-- Backgrounds -->
+    <color name="background_light">#F5F7FA</color>
+    <color name="surface_tint">#E3F2FD</color>
     <color name="card_bg">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_dark">#212121</color>
+    <color name="text_grey">#757575</color>
+    <color name="text_secondary">#9E9E9E</color>
+
+    <!-- UI Elements -->
+    <color name="divider">#E0E0E0</color>
+    <color name="card_stroke">#E8EAF0</color>
+    <color name="error_red">#D32F2F</color>
+    <color name="success_green">#2E7D32</color>
+
+    <!-- Secondary Medical -->
+    <color name="secondary_medical">#FF6F00</color>
+
+    <!-- Google -->
+    <color name="google_red">#DB4437</color>
+    <color name="google_button_bg">#FFFFFF</color>
+    <color name="google_button_stroke">#DADCE0</color>
+
+    <!-- Chat -->
+    <color name="chat_sent">#1565C0</color>
+    <color name="chat_sent_text">#FFFFFF</color>
+    <color name="chat_received">#F0F0F0</color>
+    <color name="chat_received_text">#212121</color>
+    <color name="chat_input_bg">#FFFFFF</color>
+
+    <!-- Icon backgrounds -->
+    <color name="icon_bg_blue">#E3F2FD</color>
+    <color name="icon_bg_green">#E8F5E9</color>
+    <color name="icon_bg_orange">#FFF3E0</color>
+    <color name="icon_bg_red">#FFEBEE</color>
+    <color name="icon_bg_purple">#F3E5F5</color>
+
+    <!-- Toolbar -->
+    <color name="toolbar_bg">#FFFFFF</color>
+    <color name="toolbar_title">#1565C0</color>
 </resources>

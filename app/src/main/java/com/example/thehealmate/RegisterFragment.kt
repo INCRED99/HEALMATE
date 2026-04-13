@@ -8,64 +8,75 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.thehealmate.databinding.FragmentLoginBinding
+import com.example.thehealmate.databinding.FragmentRegisterBinding
 
-class LoginFragment : Fragment() {
+class RegisterFragment : Fragment() {
 
-    private var _binding: FragmentLoginBinding? = null
+    private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Sign In button
-        binding.buttonLogin.setOnClickListener {
+        // Register button
+        binding.buttonRegister.setOnClickListener {
             if (validateInputs()) {
-                attemptLogin()
+                attemptRegister()
             }
         }
 
-        // Google Sign In button
-        binding.buttonGoogleSignIn.setOnClickListener {
+        // Google Sign Up button
+        binding.buttonGoogleSignUp.setOnClickListener {
             Toast.makeText(context, getString(R.string.google_coming_soon), Toast.LENGTH_SHORT).show()
         }
 
-        // Register link
-        binding.textRegisterLink.setOnClickListener {
-            findNavController().navigate(R.id.action_LoginFragment_to_RegisterFragment)
+        // Sign In link
+        binding.textSignInLink.setOnClickListener {
+            findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)
         }
     }
 
     private fun validateInputs(): Boolean {
-        val email = binding.inputUsername.text.toString().trim()
+        val name = binding.inputName.text.toString().trim()
+        val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
+        val confirmPassword = binding.inputConfirmPassword.text.toString()
 
         // Reset errors
+        binding.inputNameLayout.error = null
         binding.inputEmailLayout.error = null
         binding.inputPasswordLayout.error = null
+        binding.inputConfirmPasswordLayout.error = null
+
+        // Name validation
+        if (name.isEmpty()) {
+            binding.inputNameLayout.error = getString(R.string.error_name_empty)
+            binding.inputName.requestFocus()
+            return false
+        }
 
         // Email validation
         if (email.isEmpty()) {
             binding.inputEmailLayout.error = getString(R.string.error_email_empty)
-            binding.inputUsername.requestFocus()
+            binding.inputEmail.requestFocus()
             return false
         }
         if (!email.contains("@")) {
             binding.inputEmailLayout.error = getString(R.string.error_email_invalid)
-            binding.inputUsername.requestFocus()
+            binding.inputEmail.requestFocus()
             return false
         }
         if (!email.endsWith("gmail.com")) {
             binding.inputEmailLayout.error = getString(R.string.error_email_format)
-            binding.inputUsername.requestFocus()
+            binding.inputEmail.requestFocus()
             return false
         }
 
@@ -81,35 +92,45 @@ class LoginFragment : Fragment() {
             return false
         }
 
+        // Confirm password
+        if (confirmPassword != password) {
+            binding.inputConfirmPasswordLayout.error = getString(R.string.error_password_mismatch)
+            binding.inputConfirmPassword.requestFocus()
+            return false
+        }
+
         return true
     }
 
-    private fun attemptLogin() {
-        val email = binding.inputUsername.text.toString().trim()
+    private fun attemptRegister() {
+        val name = binding.inputName.text.toString().trim()
+        val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
         val isHospital = binding.radioHospital.isChecked
 
         val prefs = requireContext().getSharedPreferences("healmate_users", Context.MODE_PRIVATE)
 
-        // Check if user exists
-        val savedPassword = prefs.getString("user_${email}_password", null)
-        if (savedPassword == null) {
-            // No user found
-            Toast.makeText(context, getString(R.string.error_no_user), Toast.LENGTH_LONG).show()
+        // Check if user already exists
+        val existingUser = prefs.getString("user_${email}_password", null)
+        if (existingUser != null) {
+            Toast.makeText(context, getString(R.string.error_user_exists), Toast.LENGTH_LONG).show()
             return
         }
 
-        // Check password
-        if (savedPassword != password) {
-            Toast.makeText(context, getString(R.string.error_wrong_password), Toast.LENGTH_LONG).show()
-            return
-        }
+        // Save user to SharedPreferences
+        prefs.edit()
+            .putString("user_${email}_password", password)
+            .putString("user_${email}_name", name)
+            .putBoolean("user_${email}_isHospital", isHospital)
+            .apply()
 
-        // Success - navigate to home
+        Toast.makeText(context, getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
+
+        // Navigate to home
         val bundle = Bundle().apply {
             putBoolean("isHospital", isHospital)
         }
-        findNavController().navigate(R.id.action_LoginFragment_to_FirstFragment, bundle)
+        findNavController().navigate(R.id.action_RegisterFragment_to_FirstFragment, bundle)
     }
 
     override fun onDestroyView() {

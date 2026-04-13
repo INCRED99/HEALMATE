@@ -10,14 +10,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Generic Medicine Stores"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/primary_medical"
+        android:textColor="@color/text_dark" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Find verified medical stores near you"
+        android:textSize="14sp"
+        android:textColor="@color/text_grey"
         android:layout_marginBottom="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_stores"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clipToPadding="false" />
 
 </LinearLayout>

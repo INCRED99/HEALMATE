@@ -28,6 +28,44 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="registration_complete">Registration complete.</string>
+
+    <!-- Auth Strings -->
+    <string name="sign_in">Sign In</string>
+    <string name="register">Register</string>
+    <string name="sign_in_subtitle">Sign in to your account</string>
+    <string name="register_subtitle">Create a new account</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="full_name_hint">Full Name</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="or_text">OR</string>
+    <string name="google_sign_in">Sign in with Google</string>
+    <string name="google_sign_up">Sign up with Google</string>
+    <string name="dont_have_account">Don\'t have an account? </string>
+    <string name="register_link">Register</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="sign_in_link">Sign In</string>
+    <string name="forgot_password">Forgot Password?</string>
+
+    <!-- Validation Error Messages -->
+    <string name="error_email_empty">Please enter your email</string>
+    <string name="error_email_invalid">Email must contain \'@\'</string>
+    <string name="error_email_format">Email must end with gmail.com</string>
+    <string name="error_password_empty">Please enter your password</string>
+    <string name="error_password_short">Password must be at least 6 characters</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_name_empty">Please enter your full name</string>
+    <string name="error_no_user">No account found with this email. Please register first.</string>
+    <string name="error_wrong_password">Incorrect password. Please try again.</string>
+    <string name="error_user_exists">An account with this email already exists.</string>
+    <string name="registration_success">Account created successfully!</string>
+    <string name="google_coming_soon">Google Sign-In will be available soon!</string>
+
+    <!-- Chat -->
+    <string name="chat_title">HealMate Community</string>
+    <string name="chat_hint">Type a message…</string>
+    <string name="chat_send">Send</string>
+
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus

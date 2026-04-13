@@ -1,7 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Thehealmate" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <!-- Force light theme even in night mode - no dark cards -->
+    <style name="Base.Theme.Thehealmate" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary_medical</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/surface_tint</item>
+        <item name="colorOnPrimaryContainer">@color/primary_dark</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/text_dark</item>
+        <item name="colorSurfaceVariant">@color/surface_tint</item>
+        <item name="colorError">@color/error_red</item>
+        <item name="android:statusBarColor">@color/primary_medical</item>
     </style>
 </resources>
