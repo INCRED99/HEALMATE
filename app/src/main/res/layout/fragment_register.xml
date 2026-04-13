@@ -168,6 +168,27 @@
                         android:inputType="textPassword" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Emergency Contact Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_emergency_contact_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="Emergency Contact Number"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    app:startIconDrawable="@android:drawable/ic_menu_call"
+                    app:errorEnabled="true"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_emergency_contact"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="phone" />
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- Role Selection -->
                 <TextView
                     android:layout_width="wrap_content"

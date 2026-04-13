@@ -32,10 +32,6 @@ class MainActivity : AppCompatActivity() {
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener {
-            Toast.makeText(this, "Registered", Toast.LENGTH_SHORT).show()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
