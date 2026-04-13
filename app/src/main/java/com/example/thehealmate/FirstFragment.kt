@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.*
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import com.example.thehealmate.databinding.FragmentFirstBinding
+import  com.example.thehealmate.databinding.FragmentFirstBinding
 
 class FirstFragment : Fragment() {
 
