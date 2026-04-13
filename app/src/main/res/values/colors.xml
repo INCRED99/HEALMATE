@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary_medical">#00796B</color>
+    <color name="primary_light">#48A999</color>
+    <color name="primary_dark">#004C40</color>
+    <color name="secondary_medical">#FF6F00</color>
+    <color name="background_light">#F1F8E9</color>
+    <color name="text_dark">#212121</color>
+    <color name="text_grey">#616161</color>
+    <color name="error_red">#D32F2F</color>
+    <color name="card_bg">#FFFFFF</color>
+</resources>

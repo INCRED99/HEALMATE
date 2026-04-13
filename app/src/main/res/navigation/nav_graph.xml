@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LoginFragment">
+
+    <fragment
+        android:id="@+id/LoginFragment"
+        android:name="com.example.thehealmate.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_LoginFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/FirstFragment"
+        android:name="com.example.thehealmate.FirstFragment"
+        android:label="HealMate Home"
+        tools:layout="@layout/fragment_first">
+        <argument
+            android:name="isHospital"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_FirstFragment_to_HospitalListFragment"
+            app:destination="@id/HospitalListFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_MedicalStoreFragment"
+            app:destination="@id/MedicalStoreFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_CommunityFragment"
+            app:destination="@id/CommunityFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_RecordsFragment"
+            app:destination="@id/RecordsFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_HospitalAppointmentsFragment"
+            app:destination="@id/HospitalAppointmentsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/HospitalAppointmentsFragment"
+        android:name="com.example.thehealmate.HospitalAppointmentsFragment"
+        android:label="Appointments"
+        tools:layout="@layout/fragment_hospital_appointments" />
+
+    <fragment
+        android:id="@+id/HospitalListFragment"
+        android:name="com.example.thehealmate.HospitalListFragment"
+        android:label="Hospitals in Nagpur"
+        tools:layout="@layout/fragment_hospital_list">
+        <action
+            android:id="@+id/action_HospitalListFragment_to_SlotBookingFragment"
+            app:destination="@id/SlotBookingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/SlotBookingFragment"
+        android:name="com.example.thehealmate.SlotBookingFragment"
+        android:label="Book Slot"
+        tools:layout="@layout/fragment_slot_booking">
+        <argument
+            android:name="hospitalName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/MedicalStoreFragment"
+        android:name="com.example.thehealmate.MedicalStoreFragment"
+        android:label="Medical Stores"
+        tools:layout="@layout/fragment_medical_store" />
+
+    <fragment
+        android:id="@+id/CommunityFragment"
+        android:name="com.example.thehealmate.CommunityFragment"
+        android:label="Community"
+        tools:layout="@layout/fragment_community" />
+
+    <fragment
+        android:id="@+id/RecordsFragment"
+        android:name="com.example.thehealmate.RecordsFragment"
+        android:label="My Records"
+        tools:layout="@layout/fragment_records" />
+
+    <fragment
+        android:id="@+id/SecondFragment"
+        android:name="com.example.thehealmate.SecondFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_second">
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment" />
+    </fragment>
+</navigation>
