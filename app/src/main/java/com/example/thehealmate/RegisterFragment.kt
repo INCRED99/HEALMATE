@@ -1,19 +1,44 @@
 package com.example.thehealmate
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.thehealmate.databinding.FragmentRegisterBinding
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            firebaseAuthWithGoogle(account.idToken!!)
+        } catch (e: ApiException) {
+            Log.e("RegisterFragment", "Google sign in failed", e)
+            Toast.makeText(context, "Google Sign-In failed: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,6 +51,15 @@ class RegisterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        auth = FirebaseAuth.getInstance()
+
+        // Configure Google Sign In
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("253153362142-67anasahd0psnsnfgik8mjvqmr3ejmhf.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+
         // Register button
         binding.buttonRegister.setOnClickListener {
             if (validateInputs()) {
@@ -35,13 +69,45 @@ class RegisterFragment : Fragment() {
 
         // Google Sign Up button
         binding.buttonGoogleSignUp.setOnClickListener {
-            Toast.makeText(context, getString(R.string.google_coming_soon), Toast.LENGTH_SHORT).show()
+            val signInIntent = googleSignInClient.signInIntent
+            googleSignInLauncher.launch(signInIntent)
         }
 
         // Sign In link
         binding.textSignInLink.setOnClickListener {
             findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)
         }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    saveUserToFirestore(user?.uid, user?.displayName, user?.email, "patient")
+                    
+                    val bundle = Bundle().apply {
+                        putBoolean("isHospital", false)
+                    }
+                    findNavController().navigate(R.id.action_RegisterFragment_to_FirstFragment, bundle)
+                } else {
+                    Toast.makeText(context, "Authentication Failed.", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun saveUserToFirestore(uid: String?, name: String?, email: String?, role: String) {
+        if (uid == null) return
+        val db = FirebaseFirestore.getInstance()
+        val userMap = hashMapOf(
+            "uid" to uid,
+            "name" to name,
+            "email" to email,
+            "role" to role,
+            "createdAt" to com.google.firebase.Timestamp.now()
+        )
+        db.collection("users").document(uid).set(userMap, SetOptions.merge())
     }
 
     private fun validateInputs(): Boolean {

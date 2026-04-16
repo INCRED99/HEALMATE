@@ -12,4 +12,9 @@
         android:orderInCategory="100"
         android:title="Contact Us"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_logout"
+        android:orderInCategory="110"
+        android:title="Logout"
+        app:showAsAction="never" />
 </menu>

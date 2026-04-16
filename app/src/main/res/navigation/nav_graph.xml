@@ -59,6 +59,11 @@
             android:id="@+id/action_FirstFragment_to_RecordsFragment"
             app:destination="@id/RecordsFragment" />
         <action
+            android:id="@+id/action_FirstFragment_to_LoginFragment"
+            app:destination="@id/LoginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
             android:id="@+id/action_FirstFragment_to_HospitalAppointmentsFragment"
             app:destination="@id/HospitalAppointmentsFragment" />
     </fragment>

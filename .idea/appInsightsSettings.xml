@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.thehealmate" />
+                  <option name="mobileSdkAppId" value="1:253153362142:android:81e8816e76598f2e5f824f" />
+                  <option name="projectId" value="healmate-c66d7" />
+                  <option name="projectNumber" value="253153362142" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

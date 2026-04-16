@@ -112,11 +112,44 @@ class FirstFragment : Fragment() {
                 true
             }
             R.id.action_contact_us -> {
-                Toast.makeText(context, "Contact Us: support@thehealmate.com", Toast.LENGTH_SHORT).show()
+                showContactUsDialog()
+                true
+            }
+            R.id.action_logout -> {
+                performLogout()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun performLogout() {
+        // Sign out from Firebase
+        com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+
+        // Sign out from Google if applicable
+        val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .build()
+        val googleSignInClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(requireActivity(), gso)
+        googleSignInClient.signOut().addOnCompleteListener {
+            // Navigate back to Login
+            findNavController().navigate(R.id.action_FirstFragment_to_LoginFragment)
+            Toast.makeText(context, "Logged out successfully", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showContactUsDialog() {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_contact_us, null)
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<android.view.View>(R.id.button_close).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showEmergencyContactDialog() {
@@ -193,7 +226,10 @@ class FirstFragment : Fragment() {
         }
         
         binding.cardPatientRecords.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_RecordsFragment)
+            val bundle = Bundle().apply {
+                putBoolean("isHospital", true)
+            }
+            findNavController().navigate(R.id.action_FirstFragment_to_RecordsFragment, bundle)
         }
     }
 

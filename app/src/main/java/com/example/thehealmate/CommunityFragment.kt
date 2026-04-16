@@ -22,6 +22,16 @@ class CommunityFragment : Fragment() {
     private lateinit var chatAdapter: ChatAdapter
     private val handler = Handler(Looper.getMainLooper())
 
+    private val botJob = object : Runnable {
+        override fun run() {
+            if (_binding != null) {
+                addBotReply()
+                val nextDelay = (15000L..45000L).random()
+                handler.postDelayed(this, nextDelay)
+            }
+        }
+    }
+
     // Bot responses for auto-reply
     private val botResponses = listOf(
         "That's a great health tip! Thanks for sharing 😊",
@@ -57,6 +67,9 @@ class CommunityFragment : Fragment() {
         binding.buttonSend.setOnClickListener {
             sendMessage()
         }
+
+        // Start random bot messages
+        handler.postDelayed(botJob, 10000L)
     }
 
     private fun setupChat() {
@@ -157,6 +170,7 @@ class CommunityFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        handler.removeCallbacks(botJob)
         handler.removeCallbacksAndMessages(null)
         _binding = null
     }

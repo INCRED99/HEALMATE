@@ -31,4 +31,8 @@
         <item name="android:background">@color/toolbar_bg</item>
         <item name="titleTextColor">@color/toolbar_title</item>
     </style>
+
+    <style name="CustomAlertDialog" parent="Theme.Material3.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 </resources>

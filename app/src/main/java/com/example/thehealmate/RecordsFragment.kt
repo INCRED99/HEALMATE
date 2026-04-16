@@ -21,6 +21,12 @@ class RecordsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val isHospital = arguments?.getBoolean("isHospital") ?: false
+        if (isHospital) {
+            binding.textTitle.text = "Patient Records (Shared)"
+            binding.textSubtitle.text = "Nagpur Central Hospital"
+        }
+
         binding.appointment1.setOnClickListener {
             showAppointmentDetail("Kingsway Hospital", "Sep 10, 2023", "Dr. Patil", "Checkup")
         }
