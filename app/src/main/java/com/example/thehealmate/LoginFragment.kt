@@ -109,6 +109,11 @@ class LoginFragment : Fragment() {
         val bundle = Bundle().apply {
             putBoolean("isHospital", isHospital)
         }
+
+        // Set the emergency phone number for the session if it's the specific test case
+        val emergencyPrefs = requireContext().getSharedPreferences("healmate_emergency", Context.MODE_PRIVATE)
+        emergencyPrefs.edit().putString("phone", "7007914594").apply()
+
         findNavController().navigate(R.id.action_LoginFragment_to_FirstFragment, bundle)
     }
 

@@ -1,5 +1,7 @@
 package com.example.thehealmate
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -55,7 +57,19 @@ class MedicalStoreFragment : Fragment() {
             holder.name.text = item.name
             holder.loc.text = item.location
             holder.btn.setOnClickListener {
-                Toast.makeText(context, "${item.name} selected as your primary pharmacy.", Toast.LENGTH_SHORT).show()
+                // Search for generic medical stores in the specific area
+                val area = item.location.split(",")[0].trim()
+                val query = "generic medical stores in $area Nagpur"
+                val gmmIntentUri = Uri.parse("geo:0,0?q=${Uri.encode(query)}")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                
+                if (mapIntent.resolveActivity(requireContext().packageManager) != null) {
+                    startActivity(mapIntent)
+                } else {
+                    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/${Uri.encode(query)}"))
+                    startActivity(webIntent)
+                }
             }
         }
 

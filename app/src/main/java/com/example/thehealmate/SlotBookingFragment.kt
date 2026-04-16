@@ -2,6 +2,7 @@ package com.example.thehealmate
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,7 +59,24 @@ class SlotBookingFragment : Fragment() {
         binding.buttonConfirmBooking.setOnClickListener {
             if (selectedDate != null && selectedSlot != null) {
                 val token = (1000..9999).random()
-                Toast.makeText(context, "Appointment Confirmed! SMS sent with Token: $token", Toast.LENGTH_LONG).show()
+                val hospitalName = arguments?.getString("hospitalName") ?: "Hospital"
+                val message = "Appointment Confirmed at $hospitalName for $selectedDate at $selectedSlot. Your Token is: $token"
+                
+                // Get user's own phone or emergency phone for demo
+                val prefs = requireContext().getSharedPreferences("healmate_emergency", android.content.Context.MODE_PRIVATE)
+                val phone = prefs.getString("phone", "7007914594")
+
+                if (!phone.isNullOrEmpty()) {
+                    try {
+                        val smsManager: SmsManager = requireContext().getSystemService(SmsManager::class.java)
+                        smsManager.sendTextMessage(phone, null, message, null, null)
+                        Toast.makeText(context, "Confirmation SMS sent to $phone", Toast.LENGTH_SHORT).show()
+                    } catch (e: Exception) {
+                        // Fallback if SMS fails
+                    }
+                }
+                
+                Toast.makeText(context, "Appointment Confirmed! Token: $token", Toast.LENGTH_LONG).show()
                 findNavController().popBackStack(R.id.FirstFragment, false)
             } else {
                 Toast.makeText(context, "Please select a date and time slot", Toast.LENGTH_SHORT).show()

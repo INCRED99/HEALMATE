@@ -22,11 +22,10 @@
         <!-- Logo Icon -->
         <ImageView
             android:id="@+id/image_logo"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginTop="48dp"
-            android:src="@android:drawable/ic_menu_edit"
-            app:tint="@color/white"
+            android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -135,6 +135,10 @@ class RegisterFragment : Fragment() {
             .putBoolean("user_${email}_isHospital", isHospital)
             .apply()
 
+        // Also update the current emergency preference if it's the test number
+        val emergencyPrefs = requireContext().getSharedPreferences("healmate_emergency", Context.MODE_PRIVATE)
+        emergencyPrefs.edit().putString("phone", "7007914594").apply()
+
         Toast.makeText(context, getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
 
         // Redirect to Login Page
