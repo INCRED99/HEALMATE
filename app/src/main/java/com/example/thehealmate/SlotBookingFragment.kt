@@ -40,6 +40,8 @@ class SlotBookingFragment : Fragment() {
                 { _, year, month, dayOfMonth ->
                     selectedDate = "$dayOfMonth/${month + 1}/$year"
                     binding.textSelectedDate.text = "Date: $selectedDate"
+                    binding.textSelectedDate.setTextColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary40, null))
+                    binding.textSelectedDate.setTypeface(null, android.graphics.Typeface.BOLD)
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -51,6 +53,13 @@ class SlotBookingFragment : Fragment() {
         val slotButtons = listOf(binding.slot1, binding.slot2, binding.slot3, binding.slot4)
         slotButtons.forEach { button ->
             button.setOnClickListener {
+                // Reset all button backgrounds (using default button background)
+                slotButtons.forEach { 
+                    it.setBackgroundColor(resources.getColor(android.R.color.darker_gray, null))
+                }
+                // Highlight selected button with primary color
+                button.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary50, null))
+
                 selectedSlot = button.text.toString()
                 Toast.makeText(context, "Selected slot: $selectedSlot", Toast.LENGTH_SHORT).show()
             }

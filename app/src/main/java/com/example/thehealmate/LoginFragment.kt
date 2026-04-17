@@ -153,32 +153,24 @@ class LoginFragment : Fragment() {
         val password = binding.inputPassword.text.toString()
         val isHospital = binding.radioHospital.isChecked
 
-        val prefs = requireContext().getSharedPreferences("healmate_users", Context.MODE_PRIVATE)
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    // Update last login in Firestore
+                    if (user != null) {
+                        com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("users").document(user.uid)
+                            .update("lastLogin", com.google.firebase.Timestamp.now())
+                    }
 
-        // Check if user exists
-        val savedPassword = prefs.getString("user_${email}_password", null)
-        if (savedPassword == null) {
-            // No user found
-            Toast.makeText(context, getString(R.string.error_no_user), Toast.LENGTH_LONG).show()
-            return
-        }
-
-        // Check password
-        if (savedPassword != password) {
-            Toast.makeText(context, getString(R.string.error_wrong_password), Toast.LENGTH_LONG).show()
-            return
-        }
-
-        // Success - navigate to home
-        val bundle = Bundle().apply {
-            putBoolean("isHospital", isHospital)
-        }
-
-        // Set the emergency phone number for the session if it's the specific test case
-        val emergencyPrefs = requireContext().getSharedPreferences("healmate_emergency", Context.MODE_PRIVATE)
-        emergencyPrefs.edit().putString("phone", "7007914594").apply()
-
-        findNavController().navigate(R.id.action_LoginFragment_to_FirstFragment, bundle)
+                    val bundle = Bundle().apply {
+                        putBoolean("isHospital", isHospital)
+                    }
+                    findNavController().navigate(R.id.action_LoginFragment_to_FirstFragment, bundle)
+                } else {
+                    Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                }
+            }
     }
 
     override fun onDestroyView() {

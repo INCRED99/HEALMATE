@@ -85,7 +85,7 @@ class RegisterFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    saveUserToFirestore(user?.uid, user?.displayName, user?.email, "patient")
+                    saveUserToFirestore(user?.uid, user?.displayName, user?.email, "patient", "")
                     
                     val bundle = Bundle().apply {
                         putBoolean("isHospital", false)
@@ -97,7 +97,7 @@ class RegisterFragment : Fragment() {
             }
     }
 
-    private fun saveUserToFirestore(uid: String?, name: String?, email: String?, role: String) {
+    private fun saveUserToFirestore(uid: String?, name: String?, email: String?, role: String, emergencyContact: String) {
         if (uid == null) return
         val db = FirebaseFirestore.getInstance()
         val userMap = hashMapOf(
@@ -105,6 +105,7 @@ class RegisterFragment : Fragment() {
             "name" to name,
             "email" to email,
             "role" to role,
+            "emergencyContact" to emergencyContact,
             "createdAt" to com.google.firebase.Timestamp.now()
         )
         db.collection("users").document(uid).set(userMap, SetOptions.merge())
@@ -183,32 +184,21 @@ class RegisterFragment : Fragment() {
         val password = binding.inputPassword.text.toString()
         val emergencyContact = binding.inputEmergencyContact.text.toString().trim()
         val isHospital = binding.radioHospital.isChecked
+        val role = if (isHospital) "hospital" else "patient"
 
-        val prefs = requireContext().getSharedPreferences("healmate_users", Context.MODE_PRIVATE)
-
-        // Check if user already exists
-        val existingUser = prefs.getString("user_${email}_password", null)
-        if (existingUser != null) {
-            Toast.makeText(context, getString(R.string.error_user_exists), Toast.LENGTH_LONG).show()
-            return
-        }
-
-        // Save user to SharedPreferences
-        prefs.edit()
-            .putString("user_${email}_password", password)
-            .putString("user_${email}_name", name)
-            .putString("user_${email}_emergency", emergencyContact)
-            .putBoolean("user_${email}_isHospital", isHospital)
-            .apply()
-
-        // Also update the current emergency preference if it's the test number
-        val emergencyPrefs = requireContext().getSharedPreferences("healmate_emergency", Context.MODE_PRIVATE)
-        emergencyPrefs.edit().putString("phone", "7007914594").apply()
-
-        Toast.makeText(context, getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
-
-        // Redirect to Login Page
-        findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)
+        // Use Firebase Auth for registration
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid
+                    saveUserToFirestore(uid, name, email, role, emergencyContact)
+                    
+                    Toast.makeText(context, getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)
+                } else {
+                    Toast.makeText(context, "Registration failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                }
+            }
     }
 
     override fun onDestroyView() {

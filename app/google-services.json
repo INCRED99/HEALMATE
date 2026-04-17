@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "253153362142",
+    "project_id": "healmate-c66d7",
+    "storage_bucket": "healmate-c66d7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253153362142:android:81e8816e76598f2e5f824f",
+        "android_client_info": {
+          "package_name": "com.example.thehealmate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253153362142-8fc2k2hb6vq339nb5lvq4kgtu5s7ru93.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.thehealmate",
+            "certificate_hash": "70a14420dee6ca6bf445030a8f24810696357088"
+          }
+        },
+        {
+          "client_id": "253153362142-additional-sha256.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.thehealmate",
+            "certificate_hash": "0fb4c7d53d2a7d873e2aeefc7b60a4efdca14228adf82937c4c3f88778bf61a0"
+          }
+        },
+        {
+          "client_id": "253153362142-67anasahd0psnsnfgik8mjvqmr3ejmhf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoj4Ip9e8y0dImN28NnPfRLRoaGLYeddM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "253153362142-67anasahd0psnsnfgik8mjvqmr3ejmhf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

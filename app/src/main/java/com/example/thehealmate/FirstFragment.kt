@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.*
 import android.widget.Toast
+import android.widget.LinearLayout
+import android.widget.Button
+import android.widget.ImageButton
 import androidx.navigation.fragment.findNavController
 import com.example.thehealmate.databinding.FragmentFirstBinding
 import android.telephony.SmsManager
@@ -155,35 +158,56 @@ class FirstFragment : Fragment() {
     private fun showEmergencyContactDialog() {
         val prefs = requireContext().getSharedPreferences("healmate_emergency", android.content.Context.MODE_PRIVATE)
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_emergency, null)
-        val inputName = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.edit_emergency_name)
-        val inputPhone = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.edit_emergency_phone)
-        
-        // Use hint to indicate multi-input support
-        inputName.hint = "Name (Separate multiple by |)"
-        inputPhone.hint = "Phone (Separate multiple by |)"
-        
-        val currentNames = prefs.getString("names", "")
-        val currentPhones = prefs.getString("phone", "")
-        
-        inputName.setText(currentNames)
-        inputPhone.setText(currentPhones)
+        val container = dialogView.findViewById<LinearLayout>(R.id.container_contacts)
+        val btnAdd = dialogView.findViewById<Button>(R.id.button_add_contact)
+
+        fun addContactRow(name: String = "", phone: String = "") {
+            val rowView = LayoutInflater.from(requireContext()).inflate(R.layout.item_emergency_input, container, false)
+            val editName = rowView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.edit_name)
+            val editPhone = rowView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.edit_phone)
+            val btnRemove = rowView.findViewById<ImageButton>(R.id.button_remove)
+
+            editName.setText(name)
+            editPhone.setText(phone)
+            btnRemove.setOnClickListener { container.removeView(rowView) }
+            container.addView(rowView)
+        }
+
+        val currentContacts = prefs.getString("contacts_list", "") ?: ""
+        if (currentContacts.isNotEmpty()) {
+            currentContacts.split("|").forEach {
+                val parts = it.split(",")
+                if (parts.size == 2) {
+                    addContactRow(parts[0], parts[1])
+                }
+            }
+        } else {
+            addContactRow() // Add one empty row by default
+        }
+
+        btnAdd.setOnClickListener { addContactRow() }
 
         com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.edit_emergency_contact))
             .setView(dialogView)
             .setPositiveButton(getString(R.string.save)) { _, _ ->
-                val names = inputName.text.toString()
-                val phones = inputPhone.text.toString()
+                val contacts = mutableListOf<String>()
+                for (i in 0 until container.childCount) {
+                    val row = container.getChildAt(i)
+                    val name = row.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.edit_name).text.toString()
+                    val phone = row.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.edit_phone).text.toString()
+                    if (name.isNotEmpty() && phone.isNotEmpty()) {
+                        contacts.add("$name,$phone")
+                    }
+                }
                 
-                val namesList = names.split("|")
-                val phonesList = phones.split("|")
-                
-                val combined = namesList.zip(phonesList).joinToString("|") { "${it.first},${it.second}" }
-
+                val combined = contacts.joinToString("|")
                 prefs.edit().apply {
-                    putString("names", names)
-                    putString("phone", phones)
                     putString("contacts_list", combined)
+                    // Keep old phone key for compatibility with existing SOS logic if it uses first contact
+                    if (contacts.isNotEmpty()) {
+                        putString("phone", contacts[0].split(",")[1])
+                    }
                     apply()
                 }
                 Toast.makeText(context, getString(R.string.emergency_updated), Toast.LENGTH_SHORT).show()
