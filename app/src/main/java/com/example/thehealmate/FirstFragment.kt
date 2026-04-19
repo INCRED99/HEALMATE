@@ -17,6 +17,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import java.text.SimpleDateFormat
+import java.util.*
 
 class FirstFragment : Fragment() {
 
@@ -51,6 +54,7 @@ class FirstFragment : Fragment() {
             setupHospitalDashboard()
         } else {
             setupPatientDashboard()
+            fetchUpcomingAppointment()
         }
 
         binding.buttonSos.setOnClickListener {
@@ -216,6 +220,44 @@ class FirstFragment : Fragment() {
     }
 
 
+
+    private fun fetchUpcomingAppointment() {
+        val userId = auth.currentUser?.uid ?: return
+        val now = Calendar.getInstance().time
+        val sdf = SimpleDateFormat("d/M/yyyy h:mm a", Locale.getDefault())
+
+        db.collection("users").document(userId).collection("records")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { documents ->
+                var latestUpcoming: com.google.firebase.firestore.DocumentSnapshot? = null
+                
+                for (doc in documents) {
+                    val dateStr = doc.getString("date") ?: ""
+                    val slotStr = doc.getString("slot") ?: ""
+                    try {
+                        val apptDate = sdf.parse("$dateStr $slotStr")
+                        if (apptDate != null && apptDate.after(now)) {
+                            latestUpcoming = doc
+                            break 
+                        }
+                    } catch (e: Exception) { }
+                }
+
+                if (latestUpcoming != null && _binding != null) {
+                    binding.cardUpcomingAppointment.visibility = View.VISIBLE
+                    binding.textUpcomingHospital.text = latestUpcoming.getString("hospitalName")
+                    binding.textUpcomingDatetime.text = "${latestUpcoming.getString("date")} at ${latestUpcoming.getString("slot")}"
+                    binding.textUpcomingToken.text = "Token: ${latestUpcoming.get("token")}"
+                    
+                    binding.cardUpcomingAppointment.setOnClickListener {
+                        findNavController().navigate(R.id.action_FirstFragment_to_RecordsFragment)
+                    }
+                } else if (_binding != null) {
+                    binding.cardUpcomingAppointment.visibility = View.GONE
+                }
+            }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
