@@ -10,7 +10,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.thehealmate.databinding.FragmentGroupChatBinding
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +33,9 @@ class GroupChatFragment : Fragment() {
     private lateinit var chatAdapter: ChatAdapter
     private var groupName: String = "Support Group"
     private var groupId: String = "default_group"
+    private val defaultGroupMessageHint = "Share with the group..."
+    private var replyToMessage: ChatMessage? = null
+    private var currentUserName: String = "User"
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -60,13 +65,47 @@ class GroupChatFragment : Fragment() {
         groupName = arguments?.getString("groupName") ?: "Support Group"
         groupId = arguments?.getString("groupId") ?: "default_group"
         binding.textGroupChatName.text = groupName
+        resolveCurrentUserName()
 
         setupChat()
 
         binding.buttonGroupSend.setOnClickListener { sendTextMessage() }
         binding.buttonAttach.setOnClickListener { openImagePicker() }
 
+        binding.editGroupMessage.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && messages.isNotEmpty()) {
+                binding.recyclerGroupChat.postDelayed({
+                    binding.recyclerGroupChat.smoothScrollToPosition(messages.size - 1)
+                }, 200)
+            }
+        }
+
         loadRealMessages()
+    }
+
+    private fun markMessageAsSeen(messageId: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val userName = currentUserName.ifBlank { "User" }
+        val timeNow = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+        
+        val seenPath = "seenBy.$userId"
+        db.collection("groups").document(groupId).collection("messages").document(messageId)
+            .update(seenPath, "$userName at $timeNow")
+    }
+
+    private fun resolveCurrentUserName() {
+        val user = auth.currentUser ?: return
+        currentUserName = user.displayName?.takeIf { it.isNotBlank() }
+            ?: user.email?.substringBefore("@")
+            ?: "User"
+
+        db.collection("users").document(user.uid).get()
+            .addOnSuccessListener { doc ->
+                val profileName = doc.getString("name")?.trim().orEmpty()
+                if (profileName.isNotEmpty()) {
+                    currentUserName = profileName
+                }
+            }
     }
 
     private fun setupChat() {
@@ -75,6 +114,57 @@ class GroupChatFragment : Fragment() {
             layoutManager = LinearLayoutManager(context).apply { stackFromEnd = true }
             adapter = chatAdapter
         }
+        attachSwipeToReply()
+    }
+
+    private fun attachSwipeToReply() {
+        val swipeCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                if (position == RecyclerView.NO_POSITION) return
+
+                val selectedMessage = messages.getOrNull(position)
+                if (selectedMessage != null) {
+                    setReplyTarget(selectedMessage)
+                }
+                chatAdapter.notifyItemChanged(position)
+            }
+        }
+        ItemTouchHelper(swipeCallback).attachToRecyclerView(binding.recyclerGroupChat)
+    }
+
+    private fun setReplyTarget(message: ChatMessage) {
+        replyToMessage = message
+        val preview = message.message
+            .replace("\n", " ")
+            .trim()
+            .ifBlank { if (!message.imageUrl.isNullOrEmpty()) "Photo" else "Message" }
+            .take(40)
+
+        binding.editGroupMessage.hint = "Replying to ${message.sender}: $preview"
+        binding.editGroupMessage.requestFocus()
+        binding.editGroupMessage.setSelection(binding.editGroupMessage.text?.length ?: 0)
+        Toast.makeText(context, "Replying to ${message.sender}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun clearReplyTarget() {
+        replyToMessage = null
+        binding.editGroupMessage.hint = defaultGroupMessageHint
+    }
+
+    private fun buildReplyPrefix(message: ChatMessage): String {
+        val preview = message.message
+            .replace("\n", " ")
+            .trim()
+            .ifBlank { if (!message.imageUrl.isNullOrEmpty()) "Photo" else "Message" }
+            .take(40)
+        return "↪ ${message.sender}: $preview"
     }
 
     private fun loadRealMessages() {
@@ -85,13 +175,23 @@ class GroupChatFragment : Fragment() {
                 if (snapshot != null) {
                     messages.clear()
                     for (doc in snapshot.documents) {
+                        val msgId = doc.id
                         val text = doc.getString("message") ?: ""
                         val senderName = doc.getString("senderName") ?: "User"
                         val senderId = doc.getString("senderId") ?: ""
                         val time = doc.getString("timeString") ?: ""
                         val imageUrl = doc.getString("imageUrl")
+                        val seenBy = doc.get("seenBy") as? Map<String, String> ?: emptyMap()
+                        
                         val isSentByMe = senderId == auth.currentUser?.uid
-                        messages.add(ChatMessage(text, senderName, time, isSentByMe, imageUrl))
+                        
+                        val message = ChatMessage(msgId, text, senderName, senderId, time, isSentByMe, imageUrl, seenBy)
+                        messages.add(message)
+                        
+                        // Mark as seen if it's not our own message
+                        if (!isSentByMe && !seenBy.containsKey(auth.currentUser?.uid)) {
+                            markMessageAsSeen(msgId)
+                        }
                     }
                     chatAdapter.notifyDataSetChanged()
                     if (messages.isNotEmpty()) {
@@ -102,26 +202,34 @@ class GroupChatFragment : Fragment() {
     }
 
     private fun sendTextMessage(imageUrl: String? = null) {
-        val text = binding.editGroupMessage.text.toString().trim()
+        val rawText = binding.editGroupMessage.text.toString().trim()
+        val replyPrefix = replyToMessage?.let { buildReplyPrefix(it) }
+        val text = when {
+            rawText.isNotEmpty() && !replyPrefix.isNullOrEmpty() -> "$replyPrefix\n$rawText"
+            rawText.isNotEmpty() -> rawText
+            imageUrl != null && !replyPrefix.isNullOrEmpty() -> replyPrefix
+            else -> rawText
+        }
         if (text.isEmpty() && imageUrl == null) return
 
         val timeString = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         val user = auth.currentUser
-        val senderName = user?.displayName?.takeIf { it.isNotEmpty() }
-            ?: user?.email?.substringBefore("@") ?: "User"
-        val senderId = user?.uid ?: ""
+        val userId = user?.uid ?: ""
+        val senderName = currentUserName.ifBlank { "User" }
 
         val messageData = hashMapOf(
             "message" to text,
             "senderName" to senderName,
-            "senderId" to senderId,
+            "senderId" to userId,
             "timeString" to timeString,
-            "timestamp" to Timestamp.now()
+            "timestamp" to com.google.firebase.Timestamp.now(),
+            "imageUrl" to imageUrl,
+            "seenBy" to mapOf(userId to "$senderName at $timeString")
         )
-        if (imageUrl != null) messageData["imageUrl"] = imageUrl
 
         db.collection("groups").document(groupId).collection("messages").add(messageData)
         binding.editGroupMessage.text.clear()
+        clearReplyTarget()
     }
 
     private fun openImagePicker() {
@@ -147,6 +255,7 @@ class GroupChatFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         messageListener?.remove()
+        replyToMessage = null
         _binding = null
     }
 }

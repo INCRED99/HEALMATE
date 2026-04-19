@@ -17,10 +17,6 @@
             android:icon="@android:drawable/ic_menu_share"
             android:title="Support Groups" />
         <item
-            android:id="@+id/HealthTipsFragment"
-            android:icon="@android:drawable/ic_menu_help"
-            android:title="Daily Health Tips" />
-        <item
             android:id="@+id/ProfileFragment"
             android:icon="@android:drawable/ic_menu_myplaces"
             android:title="Profile Settings" />

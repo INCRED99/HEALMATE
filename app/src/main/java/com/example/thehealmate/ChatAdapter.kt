@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Locale
 
 class ChatAdapter(private val messages: List<ChatMessage>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -41,6 +42,32 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
             holder.bind(message)
         } else if (holder is ReceivedViewHolder) {
             holder.bind(message)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            if (!message.isSent) return@setOnLongClickListener false
+            
+            val context = holder.itemView.context
+            val othersWhoSaw = message.seenBy
+                .filterKeys { it != message.senderId }
+                .values
+                .map { parseSeenEntry(it) }
+                .sortedBy { it.first.lowercase(Locale.getDefault()) }
+            val seenSection = if (othersWhoSaw.isEmpty()) {
+                "No one yet"
+            } else {
+                othersWhoSaw.joinToString("\n") { (name, seenTime) ->
+                    if (seenTime.isBlank()) "• $name" else "• $name ($seenTime)"
+                }
+            }
+            val sentAt = message.timestamp.ifBlank { "Unknown time" }
+            
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+                .setTitle("Message Info")
+                .setMessage("Sent at: $sentAt\n\nSeen by:\n$seenSection")
+                .setPositiveButton("OK", null)
+                .show()
+            true
         }
     }
 
@@ -105,6 +132,18 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
     }
 }
 
+private fun parseSeenEntry(rawEntry: String): Pair<String, String> {
+    val trimmed = rawEntry.trim()
+    val separator = " at "
+    val separatorIndex = trimmed.lastIndexOf(separator)
+    return if (separatorIndex > 0 && separatorIndex < trimmed.length - separator.length) {
+        val name = trimmed.substring(0, separatorIndex).trim()
+        val seenTime = trimmed.substring(separatorIndex + separator.length).trim()
+        (if (name.isBlank()) trimmed else name) to seenTime
+    } else {
+        trimmed to ""
+    }
+}
 private fun loadImageFromUrl(url: String, imageView: ImageView) {
     Thread {
         try {

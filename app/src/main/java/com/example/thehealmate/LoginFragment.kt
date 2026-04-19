@@ -27,6 +27,9 @@ class LoginFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private val prefsName = "healmate_prefs"
+    private val dailyFactUserKey = "daily_fact_user_id"
+    private val dailyFactTextKey = "daily_fact_text"
 
     private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -79,14 +82,16 @@ class LoginFragment : Fragment() {
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val isHospital = binding.radioHospital.isChecked
         auth.signInWithCredential(credential)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    saveUserToFirestore(user?.uid, user?.displayName, user?.email)
+                    saveUserToFirestore(user?.uid, user?.displayName, user?.email, isHospital)
+                    saveSessionDailyFact(user?.uid)
                     
                     val bundle = Bundle().apply {
-                        putBoolean("isHospital", false)
+                        putBoolean("isHospital", isHospital)
                     }
                     findNavController().navigate(R.id.action_LoginFragment_to_FirstFragment, bundle)
                 } else {
@@ -95,14 +100,15 @@ class LoginFragment : Fragment() {
             }
     }
 
-    private fun saveUserToFirestore(uid: String?, name: String?, email: String?) {
+    private fun saveUserToFirestore(uid: String?, name: String?, email: String?, isHospital: Boolean) {
         if (uid == null) return
         val db = FirebaseFirestore.getInstance()
+        val role = if (isHospital) "hospital" else "patient"
         val userMap = hashMapOf(
             "uid" to uid,
             "name" to name,
             "email" to email,
-            "role" to "patient",
+            "role" to role,
             "lastLogin" to com.google.firebase.Timestamp.now()
         )
         db.collection("users").document(uid).set(userMap, SetOptions.merge())
@@ -140,6 +146,7 @@ class LoginFragment : Fragment() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
+                    saveSessionDailyFact(auth.currentUser?.uid)
                     val bundle = Bundle().apply {
                         putBoolean("isHospital", isHospital)
                     }
@@ -148,6 +155,15 @@ class LoginFragment : Fragment() {
                     Toast.makeText(context, "Login failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    private fun saveSessionDailyFact(userId: String?) {
+        if (userId.isNullOrBlank()) return
+        val prefs = requireContext().getSharedPreferences(prefsName, android.content.Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(dailyFactUserKey, userId)
+            .putString(dailyFactTextKey, DailyHealthFacts.randomFact())
+            .apply()
     }
 
     override fun onDestroyView() {

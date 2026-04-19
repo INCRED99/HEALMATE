@@ -28,6 +28,9 @@ class FirstFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
+    private val prefsName = "healmate_prefs"
+    private val dailyFactUserKey = "daily_fact_user_id"
+    private val dailyFactTextKey = "daily_fact_text"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +51,7 @@ class FirstFragment : Fragment() {
         val isHospital = arguments?.getBoolean("isHospital") ?: false
         
         loadUserData()
+        showDailyFactForCurrentUser()
         setupFeatureCards(isHospital)
 
         if (isHospital) {
@@ -129,6 +133,23 @@ class FirstFragment : Fragment() {
         binding.cardHospitalSettings.root.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_ProfileFragment)
         }
+    }
+
+    private fun showDailyFactForCurrentUser() {
+        val userId = auth.currentUser?.uid ?: return
+        val prefs = requireContext().getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+        val storedUserId = prefs.getString(dailyFactUserKey, null)
+        var fact = prefs.getString(dailyFactTextKey, null)
+
+        if (storedUserId != userId || fact.isNullOrBlank()) {
+            fact = DailyHealthFacts.randomFact()
+            prefs.edit()
+                .putString(dailyFactUserKey, userId)
+                .putString(dailyFactTextKey, fact)
+                .apply()
+        }
+
+        binding.textDailyFact.text = fact
     }
 
     private fun setupPatientDashboard() {
@@ -223,32 +244,34 @@ class FirstFragment : Fragment() {
 
     private fun fetchUpcomingAppointment() {
         val userId = auth.currentUser?.uid ?: return
-        val now = Calendar.getInstance().time
+        val now = Calendar.getInstance()
         val sdf = SimpleDateFormat("d/M/yyyy h:mm a", Locale.getDefault())
 
         db.collection("users").document(userId).collection("records")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
-                var latestUpcoming: com.google.firebase.firestore.DocumentSnapshot? = null
+                val upcomingAppointments = mutableListOf<Pair<com.google.firebase.firestore.DocumentSnapshot, Date>>()
                 
                 for (doc in documents) {
                     val dateStr = doc.getString("date") ?: ""
                     val slotStr = doc.getString("slot") ?: ""
                     try {
                         val apptDate = sdf.parse("$dateStr $slotStr")
-                        if (apptDate != null && apptDate.after(now)) {
-                            latestUpcoming = doc
-                            break 
+                        if (apptDate != null && apptDate.after(now.time)) {
+                            upcomingAppointments.add(doc to apptDate)
                         }
                     } catch (e: Exception) { }
                 }
 
-                if (latestUpcoming != null && _binding != null) {
+                // Sort by date/time ascending to get the SOONEST future appointment
+                upcomingAppointments.sortBy { it.second }
+
+                if (upcomingAppointments.isNotEmpty() && _binding != null) {
+                    val soonestDoc = upcomingAppointments[0].first
                     binding.cardUpcomingAppointment.visibility = View.VISIBLE
-                    binding.textUpcomingHospital.text = latestUpcoming.getString("hospitalName")
-                    binding.textUpcomingDatetime.text = "${latestUpcoming.getString("date")} at ${latestUpcoming.getString("slot")}"
-                    binding.textUpcomingToken.text = "Token: ${latestUpcoming.get("token")}"
+                    binding.textUpcomingHospital.text = soonestDoc.getString("hospitalName")
+                    binding.textUpcomingDatetime.text = "${soonestDoc.getString("date")} at ${soonestDoc.getString("slot")}"
+                    binding.textUpcomingToken.text = "Token: ${soonestDoc.get("token")}"
                     
                     binding.cardUpcomingAppointment.setOnClickListener {
                         findNavController().navigate(R.id.action_FirstFragment_to_RecordsFragment)

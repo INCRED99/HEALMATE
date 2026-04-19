@@ -102,12 +102,12 @@
             android:name="hospitalName"
             app:argType="string" />
     </fragment>
-
     <fragment
         android:id="@+id/HealthTipsFragment"
         android:name="com.example.thehealmate.HealthTipsFragment"
         android:label="Daily Health Tips"
         tools:layout="@layout/fragment_health_tips" />
+
 
     <fragment
         android:id="@+id/MedicalStoreFragment"
