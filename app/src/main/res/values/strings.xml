@@ -4,6 +4,8 @@
     <string name="first_fragment_label">Home</string>
     <string name="second_fragment_label">Details</string>
 
+    <string name="default_web_client_id">253153362142-67anasahd0psnsnfgik8mjvqmr3ejmhf.apps.googleusercontent.com</string>
+
     <!-- Role Selection -->
     <string name="welcome_message">Welcome to HealMate</string>
     <string name="select_role">Please select your role</string>
@@ -59,7 +61,7 @@
     <string name="error_wrong_password">Incorrect password. Please try again.</string>
     <string name="error_user_exists">An account with this email already exists.</string>
     <string name="registration_success">Account created successfully!</string>
-    <string name="google_coming_soon">Google Sign-In will be available soon!</string>
+    <string name="google_coming_soon">Google Sign-In is now active!</string>
 
     <!-- Chat -->
     <string name="chat_title">HealMate Community</string>

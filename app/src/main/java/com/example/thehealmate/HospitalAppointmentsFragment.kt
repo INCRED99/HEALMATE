@@ -1,17 +1,25 @@
 package com.example.thehealmate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.thehealmate.databinding.FragmentHospitalAppointmentsBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HospitalAppointmentsFragment : Fragment() {
 
     private var _binding: FragmentHospitalAppointmentsBinding? = null
     private val binding get() = _binding!!
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val appointments = mutableListOf<Appointment>()
+    private lateinit var adapter: AppointmentAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,16 +32,34 @@ class HospitalAppointmentsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val mockAppointments = listOf(
-            Appointment("Rahul Sharma", "15/05/2024", "10:30 AM", "4821"),
-            Appointment("Priya Verma", "15/05/2024", "11:15 AM", "5932"),
-            Appointment("Amit Deshmukh", "15/05/2024", "12:00 PM", "1024"),
-            Appointment("Sneha Patil", "16/05/2024", "09:45 AM", "8872"),
-            Appointment("Vikram Singh", "16/05/2024", "02:30 PM", "3341")
-        )
-
+        adapter = AppointmentAdapter(appointments)
         binding.recyclerAppointments.layoutManager = LinearLayoutManager(context)
-        binding.recyclerAppointments.adapter = AppointmentAdapter(mockAppointments)
+        binding.recyclerAppointments.adapter = adapter
+
+        fetchAppointments()
+    }
+
+    private fun fetchAppointments() {
+        val uid = auth.currentUser?.uid ?: return
+        db.collection("appointments").whereEqualTo("hospitalId", uid).get()
+            .addOnSuccessListener { snapshot ->
+                appointments.clear()
+                if (snapshot.isEmpty) {
+                    Toast.makeText(context, "No appointments found", Toast.LENGTH_SHORT).show()
+                } else {
+                    for (doc in snapshot.documents) {
+                        val name = doc.getString("patientName") ?: "Unknown"
+                        val date = doc.getString("date") ?: "--/--/----"
+                        val time = doc.getString("time") ?: "--:--"
+                        val ref = doc.getString("reference") ?: doc.id.takeLast(4)
+                        appointments.add(Appointment(name, date, time, ref))
+                    }
+                }
+                adapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to load appointments", Toast.LENGTH_SHORT).show()
+            }
     }
 
     override fun onDestroyView() {

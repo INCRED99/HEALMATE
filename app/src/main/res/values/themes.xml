@@ -1,38 +1,40 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Thehealmate" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Primary colors -->
+    <style name="Theme.HealMate" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primary_medical</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/surface_tint</item>
-        <item name="colorOnPrimaryContainer">@color/primary_dark</item>
-
-        <!-- Secondary colors -->
+        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorOnSecondary">@color/white</item>
-
-        <!-- Background -->
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnSurface">@color/text_dark</item>
-        <item name="colorSurfaceVariant">@color/surface_tint</item>
-
-        <!-- Error -->
-        <item name="colorError">@color/error_red</item>
-
-        <!-- Status bar -->
-        <item name="android:statusBarColor">@color/primary_medical</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- Customize your theme here. -->
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="Theme.Thehealmate" parent="Base.Theme.Thehealmate" />
-
-    <!-- Toolbar style -->
-    <style name="Theme.Thehealmate.Toolbar" parent="">
-        <item name="android:background">@color/toolbar_bg</item>
-        <item name="titleTextColor">@color/toolbar_title</item>
+    <style name="CustomAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceMediumComponent">@style/RoundedCorners</item>
     </style>
 
-    <style name="CustomAlertDialog" parent="Theme.Material3.Light.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
+    <style name="RoundedCorners" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
     </style>
+
+    <style name="CircleImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="bg_badge_white" parent="">
+        <item name="android:background">@drawable/bg_badge_white</item>
+    </style>
+
 </resources>

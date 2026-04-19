@@ -35,8 +35,8 @@ class RegisterFragment : Fragment() {
             val account = task.getResult(ApiException::class.java)!!
             firebaseAuthWithGoogle(account.idToken!!)
         } catch (e: ApiException) {
-            Log.e("RegisterFragment", "Google sign in failed", e)
-            Toast.makeText(context, "Google Sign-In failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            Log.e("RegisterFragment", "Google sign in failed code: ${e.statusCode}", e)
+            Toast.makeText(context, "Google Sign-In failed: ${e.statusCode}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -53,9 +53,10 @@ class RegisterFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Configure Google Sign In
+        // Using the Client ID directly to avoid R.string issues during runtime
+        val webClientId = "253153362142-67anasahd0psnsnfgik8mjvqmr3ejmhf.apps.googleusercontent.com"
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("253153362142-67anasahd0psnsnfgik8mjvqmr3ejmhf.apps.googleusercontent.com")
+            .requestIdToken(webClientId)
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
@@ -69,8 +70,10 @@ class RegisterFragment : Fragment() {
 
         // Google Sign Up button
         binding.buttonGoogleSignUp.setOnClickListener {
-            val signInIntent = googleSignInClient.signInIntent
-            googleSignInLauncher.launch(signInIntent)
+            googleSignInClient.signOut().addOnCompleteListener {
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
+            }
         }
 
         // Sign In link
@@ -116,62 +119,34 @@ class RegisterFragment : Fragment() {
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
         val confirmPassword = binding.inputConfirmPassword.text.toString()
-        val emergencyContact = binding.inputEmergencyContact.text.toString().trim()
 
         // Reset errors
         binding.inputNameLayout.error = null
         binding.inputEmailLayout.error = null
         binding.inputPasswordLayout.error = null
         binding.inputConfirmPasswordLayout.error = null
-        binding.inputEmergencyContactLayout.error = null
 
         // Name validation
         if (name.isEmpty()) {
             binding.inputNameLayout.error = getString(R.string.error_name_empty)
-            binding.inputName.requestFocus()
             return false
         }
 
         // Email validation
         if (email.isEmpty()) {
             binding.inputEmailLayout.error = getString(R.string.error_email_empty)
-            binding.inputEmail.requestFocus()
-            return false
-        }
-        if (!email.contains("@")) {
-            binding.inputEmailLayout.error = getString(R.string.error_email_invalid)
-            binding.inputEmail.requestFocus()
-            return false
-        }
-        if (!email.endsWith("gmail.com")) {
-            binding.inputEmailLayout.error = getString(R.string.error_email_format)
-            binding.inputEmail.requestFocus()
-            return false
-        }
-
-        // Emergency Contact validation (optional but good to have)
-        if (emergencyContact.isEmpty() && binding.radioPatient.isChecked) {
-            binding.inputEmergencyContactLayout.error = "Emergency contact is required for patients"
-            binding.inputEmergencyContact.requestFocus()
             return false
         }
 
         // Password validation
-        if (password.isEmpty()) {
-            binding.inputPasswordLayout.error = getString(R.string.error_password_empty)
-            binding.inputPassword.requestFocus()
-            return false
-        }
         if (password.length < 6) {
             binding.inputPasswordLayout.error = getString(R.string.error_password_short)
-            binding.inputPassword.requestFocus()
             return false
         }
 
         // Confirm password
         if (confirmPassword != password) {
             binding.inputConfirmPasswordLayout.error = getString(R.string.error_password_mismatch)
-            binding.inputConfirmPassword.requestFocus()
             return false
         }
 
@@ -182,7 +157,6 @@ class RegisterFragment : Fragment() {
         val name = binding.inputName.text.toString().trim()
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
-        val emergencyContact = binding.inputEmergencyContact.text.toString().trim()
         val isHospital = binding.radioHospital.isChecked
         val role = if (isHospital) "hospital" else "patient"
 
@@ -191,7 +165,7 @@ class RegisterFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     val uid = auth.currentUser?.uid
-                    saveUserToFirestore(uid, name, email, role, emergencyContact)
+                    saveUserToFirestore(uid, name, email, role, "")
                     
                     Toast.makeText(context, getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
                     findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)

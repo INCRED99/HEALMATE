@@ -3,51 +3,44 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Healthcare Blue Palette -->
-    <color name="primary_medical">#1565C0</color>
-    <color name="primary_light">#5E92F3</color>
-    <color name="primary_dark">#003C8F</color>
-    <color name="accent">#00BFA5</color>
+    <!-- Professional Medical Palette -->
+    <color name="primary_medical">#0A66C2</color>
+    <color name="primary_light">#E1F0FF</color>
+    <color name="primary_dark">#084482</color>
+    <color name="accent">#00D2B4</color>
+    <color name="surface_tint">#E1F0FF</color>
+    <color name="secondary_medical">#FF6D00</color>
 
-    <!-- Backgrounds -->
-    <color name="background_light">#F5F7FA</color>
-    <color name="surface_tint">#E3F2FD</color>
+    <!-- Sophisticated Backgrounds -->
+    <color name="background_light">#F8FAFD</color>
+    <color name="surface_variant">#FFFFFF</color>
     <color name="card_bg">#FFFFFF</color>
 
-    <!-- Text -->
-    <color name="text_dark">#212121</color>
-    <color name="text_grey">#757575</color>
-    <color name="text_secondary">#9E9E9E</color>
+    <!-- Professional Text -->
+    <color name="text_dark">#1A1C1E</color>
+    <color name="text_grey">#44474E</color>
+    <color name="text_secondary">#74777F</color>
 
-    <!-- UI Elements -->
-    <color name="divider">#E0E0E0</color>
-    <color name="card_stroke">#E8EAF0</color>
-    <color name="error_red">#D32F2F</color>
-    <color name="success_green">#2E7D32</color>
+    <!-- Status Colors -->
+    <color name="divider">#C4C7CF</color>
+    <color name="card_stroke">#DDE2EA</color>
+    <color name="error_red">#BA1A1A</color>
+    <color name="success_green">#006D3A</color>
+    <color name="warning_orange">#8F4E00</color>
 
-    <!-- Secondary Medical -->
-    <color name="secondary_medical">#FF6F00</color>
-
-    <!-- Google -->
-    <color name="google_red">#DB4437</color>
-    <color name="google_button_bg">#FFFFFF</color>
-    <color name="google_button_stroke">#DADCE0</color>
-
-    <!-- Chat -->
-    <color name="chat_sent">#1565C0</color>
-    <color name="chat_sent_text">#FFFFFF</color>
-    <color name="chat_received">#F0F0F0</color>
-    <color name="chat_received_text">#212121</color>
-    <color name="chat_input_bg">#FFFFFF</color>
-
-    <!-- Icon backgrounds -->
-    <color name="icon_bg_blue">#E3F2FD</color>
-    <color name="icon_bg_green">#E8F5E9</color>
-    <color name="icon_bg_orange">#FFF3E0</color>
-    <color name="icon_bg_red">#FFEBEE</color>
+    <!-- Icon Accents -->
+    <color name="icon_bg_blue">#D1E4FF</color>
+    <color name="icon_bg_green">#C4EED0</color>
+    <color name="icon_bg_orange">#FFDDB3</color>
+    <color name="icon_bg_red">#FFDAD6</color>
     <color name="icon_bg_purple">#F3E5F5</color>
 
-    <!-- Toolbar -->
-    <color name="toolbar_bg">#FFFFFF</color>
-    <color name="toolbar_title">#1565C0</color>
+    <!-- Chat Colors -->
+    <color name="chat_sent">#0A66C2</color>
+    <color name="chat_sent_text">#FFFFFF</color>
+    <color name="chat_received">#F2F4F7</color>
+    <color name="chat_received_text">#1A1C1E</color>
+
+    <!-- UI Component Colors -->
+    <color name="google_button_stroke">#DADCE0</color>
 </resources>

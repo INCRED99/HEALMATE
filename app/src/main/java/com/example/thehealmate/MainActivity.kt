@@ -13,7 +13,9 @@ import android.view.Menu
 import android.view.MenuItem
 import com.example.thehealmate.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
-
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
+import androidx.navigation.ui.setupWithNavController
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -31,15 +33,41 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         val navController = navHostFragment.navController
 
+        val drawerLayout: DrawerLayout = binding.root
+        val navView: NavigationView = findViewById(R.id.nav_view)
+
         // Check if user is logged in
         if (FirebaseAuth.getInstance().currentUser != null) {
             val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
             navGraph.setStartDestination(R.id.FirstFragment)
             navController.graph = navGraph
+        } else {
+            // we should not show the drawer handles if not logged in
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         }
 
-        appBarConfiguration = AppBarConfiguration(navController.graph)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.FirstFragment), drawerLayout
+        )
         setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_logout -> {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate(R.id.LoginFragment)
+                    drawerLayout.closeDrawers()
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                    true
+                }
+                else -> {
+                    val handled = androidx.navigation.ui.NavigationUI.onNavDestinationSelected(menuItem, navController)
+                    drawerLayout.closeDrawers()
+                    handled || super.onOptionsItemSelected(menuItem)
+                }
+            }
+        }
 
         requestInitialPermissions()
     }

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/card_stroke">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image_doctor"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_myplaces"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/CircleImage"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/primary_light"/>
+
+        <!-- Status Indicator -->
+        <View
+            android:id="@+id/view_status_indicator"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:background="@drawable/bg_status_offline"
+            android:elevation="4dp"
+            app:layout_constraintBottom_toBottomOf="@id/image_doctor"
+            app:layout_constraintEnd_toEndOf="@id/image_doctor" />
+
+        <TextView
+            android:id="@+id/text_doctor_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Dr. Alok Gupta"
+            android:textColor="@color/text_dark"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/text_rating"
+            app:layout_constraintStart_toEndOf="@id/image_doctor"
+            app:layout_constraintTop_toTopOf="@id/image_doctor" />
+
+        <TextView
+            android:id="@+id/text_specialization"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cardiologist"
+            android:textColor="@color/primary_medical"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@id/text_doctor_name"
+            app:layout_constraintTop_toBottomOf="@id/text_doctor_name" />
+
+        <TextView
+            android:id="@+id/text_experience"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10 Years"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/text_doctor_name"
+            app:layout_constraintTop_toBottomOf="@id/text_specialization" />
+
+        <TextView
+            android:id="@+id/text_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Offline"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/text_doctor_name"
+            app:layout_constraintTop_toBottomOf="@id/text_experience" />
+
+        <TextView
+            android:id="@+id/text_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="4dp"
+            android:text="4.9"
+            android:textColor="@color/text_dark"
+            android:textStyle="bold"
+            android:background="@drawable/bg_badge_white"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            app:drawableStartCompat="@android:drawable/star_on"
+            app:drawableTint="@color/secondary_medical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/text_doctor_name" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/text_doctor_name"
+            app:layout_constraintTop_toBottomOf="@id/text_status">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_consult"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Consult"
+                android:textSize="12sp"
+                app:cornerRadius="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_video"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Video"
+                android:textSize="12sp"
+                app:icon="@android:drawable/presence_video_online"
+                app:iconSize="16dp"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

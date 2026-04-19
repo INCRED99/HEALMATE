@@ -51,7 +51,7 @@
             app:destination="@id/HospitalListFragment" />
         <action
             android:id="@+id/action_FirstFragment_to_MedicalStoreFragment"
-            app:destination="@id/MedicalStoreFragment" />
+            app:destination="@+id/MedicalStoreFragment" />
         <action
             android:id="@+id/action_FirstFragment_to_CommunityFragment"
             app:destination="@id/CommunityFragment" />
@@ -66,6 +66,15 @@
         <action
             android:id="@+id/action_FirstFragment_to_HospitalAppointmentsFragment"
             app:destination="@id/HospitalAppointmentsFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_ProfileFragment"
+            app:destination="@id/ProfileFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_TelemedicineFragment"
+            app:destination="@id/TelemedicineFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_GroupChatListFragment"
+            app:destination="@id/GroupChatListFragment" />
     </fragment>
 
     <fragment
@@ -95,6 +104,12 @@
     </fragment>
 
     <fragment
+        android:id="@+id/HealthTipsFragment"
+        android:name="com.example.thehealmate.HealthTipsFragment"
+        android:label="Daily Health Tips"
+        tools:layout="@layout/fragment_health_tips" />
+
+    <fragment
         android:id="@+id/MedicalStoreFragment"
         android:name="com.example.thehealmate.MedicalStoreFragment"
         android:label="Medical Stores"
@@ -111,6 +126,58 @@
         android:name="com.example.thehealmate.RecordsFragment"
         android:label="My Records"
         tools:layout="@layout/fragment_records" />
+
+    <fragment
+        android:id="@+id/ProfileFragment"
+        android:name="com.example.thehealmate.ProfileFragment"
+        android:label="My Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/TelemedicineFragment"
+        android:name="com.example.thehealmate.TelemedicineFragment"
+        android:label="Telemedicine"
+        tools:layout="@layout/fragment_telemedicine">
+        <action
+            android:id="@+id/action_TelemedicineFragment_to_ChatSessionFragment"
+            app:destination="@id/ChatSessionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ChatSessionFragment"
+        android:name="com.example.thehealmate.ChatSessionFragment"
+        android:label="Consultation"
+        tools:layout="@layout/fragment_chat_session">
+        <argument
+            android:name="doctorName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/GroupChatListFragment"
+        android:name="com.example.thehealmate.GroupChatListFragment"
+        android:label="Support Groups"
+        tools:layout="@layout/fragment_group_chat_list">
+        <action
+            android:id="@+id/action_GroupChatListFragment_to_GroupChatFragment"
+            app:destination="@id/GroupChatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/GroupChatFragment"
+        android:name="com.example.thehealmate.GroupChatFragment"
+        android:label="Group Discussion"
+        tools:layout="@layout/fragment_group_chat">
+        <argument
+            android:name="groupName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/MedicalStoreFragment"
+        android:name="com.example.thehealmate.MedicalStoreFragment"
+        android:label="Medical Stores"
+        tools:layout="@layout/fragment_medical_store" />
 
     <fragment
         android:id="@+id/SecondFragment"

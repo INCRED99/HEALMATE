@@ -6,70 +6,111 @@
     android:layout_height="match_parent"
     android:background="@color/background_light">
 
-    <!-- Header -->
-    <TextView
-        android:id="@+id/text_community_title"
-        android:layout_width="0dp"
+    <!-- Professional Header -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_comm_header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/chat_title"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/primary_medical"
-        android:background="@color/white"
-        android:elevation="2dp"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="6dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:strokeWidth="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_header_gradient"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/text_community_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HealMate Community"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Real-time thoughts &amp; experiences"
+                android:textColor="#CCFFFFFF"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="@id/text_community_title"
+                app:layout_constraintTop_toBottomOf="@id/text_community_title" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_info_details"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white"
+                android:contentDescription="Info" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Chat Messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="8dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/text_community_title"
+        android:padding="12dp"
         app:layout_constraintBottom_toTopOf="@id/layout_input"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/card_comm_header" />
 
-    <!-- Input Bar -->
-    <LinearLayout
+    <!-- Professional Input Bar -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/layout_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:background="@color/white"
-        android:elevation="4dp"
-        android:gravity="center_vertical"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:cardCornerRadius="32dp"
+        app:cardElevation="12dp"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/card_stroke">
 
-        <EditText
-            android:id="@+id/edit_message"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:hint="@string/chat_hint"
-            android:background="@drawable/bg_chat_input"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textSize="15sp"
-            android:textColorHint="@color/text_secondary"
-            android:inputType="text"
-            android:importantForAutofill="no"
-            android:maxLines="1" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_send"
-            style="@style/Widget.Material3.Button.Icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            app:icon="@android:drawable/ic_menu_send"
-            app:iconSize="20dp"
-            app:cornerRadius="24dp" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/edit_message"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Share your thoughts..."
+                android:importantForAutofill="no"
+                android:inputType="textCapSentences"
+                android:maxLines="4"
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_send"
+                style="@style/Widget.Material3.Button.IconButton.Filled"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_margin="2dp"
+                app:cornerRadius="22dp"
+                app:icon="@android:drawable/ic_menu_send"
+                app:iconSize="20dp"
+                app:iconTint="@color/white" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
