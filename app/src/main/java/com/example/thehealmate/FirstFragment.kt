@@ -18,6 +18,11 @@ import com.google.android.gms.location.LocationServices
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import java.text.SimpleDateFormat
+import java.util.*
+
 class FirstFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
@@ -232,10 +237,80 @@ class FirstFragment : Fragment() {
         binding.cardCommunity.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_CommunityFragment)
         }
-        
+
         binding.cardRecords.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_RecordsFragment)
         }
+
+        showDailyWellnessContent()
+        fetchUpcomingAppointment()
+    }
+
+    private fun fetchUpcomingAppointment() {
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+        val now = Calendar.getInstance().time
+        val sdf = SimpleDateFormat("d/M/yyyy h:mm a", Locale.getDefault())
+
+        db.collection("users").document(userId).collection("records")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { documents ->
+                var latestUpcoming: com.google.firebase.firestore.DocumentSnapshot? = null
+                
+                for (doc in documents) {
+                    val dateStr = doc.getString("date") ?: ""
+                    val slotStr = doc.getString("slot") ?: ""
+                    try {
+                        val apptDate = sdf.parse("$dateStr $slotStr")
+                        if (apptDate != null && apptDate.after(now)) {
+                            latestUpcoming = doc
+                            break // Found the most recent upcoming one (since ordered by timestamp DESC)
+                        }
+                    } catch (e: Exception) { }
+                }
+
+                if (latestUpcoming != null) {
+                    binding.cardUpcomingAppointment.visibility = View.VISIBLE
+                    binding.textUpcomingHospital.text = latestUpcoming.getString("hospitalName")
+                    binding.textUpcomingDatetime.text = "${latestUpcoming.getString("date")} at ${latestUpcoming.getString("slot")}"
+                    binding.textUpcomingToken.text = "Token: ${latestUpcoming.get("token")}"
+                    
+                    binding.cardUpcomingAppointment.setOnClickListener {
+                        findNavController().navigate(R.id.action_FirstFragment_to_RecordsFragment)
+                    }
+                } else {
+                    binding.cardUpcomingAppointment.visibility = View.GONE
+                }
+            }
+    }
+
+    private fun showDailyWellnessContent() {
+        val wellnessTips = listOf(
+            "Food is not just fuel—it’s information for your body.",
+            "Drinking 2–3 liters of water daily improves energy and metabolism.",
+            "30 minutes of exercise a day can reduce heart disease risk by up to 30%.",
+            "Your diet is a bank account—good choices are good investments.",
+            "Eating 5 servings of fruits and vegetables daily boosts immunity.",
+            "Exercise is a celebration of what your body can do—not a punishment.",
+            "Getting 7–9 hours of sleep improves brain function and recovery.",
+            "10,000 steps a day can significantly improve cardiovascular health.",
+            "A little progress each day adds up to big results.",
+            "Reducing sugar intake lowers diabetes risk by nearly 40%.",
+            "Your body hears everything your mind says—stay positive.",
+            "Strength training 2–3 times a week improves muscle and bone health.",
+            "Take care of your body—it’s the only place you have to live.",
+            "Sitting more than 8 hours a day increases health risks.",
+            "Health is not a goal—it’s a lifestyle.",
+            "Losing just 5–10% of body weight improves overall health markers.",
+            "Consistency beats perfection in fitness and health.",
+            "Eating breakfast improves concentration and energy levels.",
+            "Sleep, nutrition, and exercise together form 100% of your wellness.",
+            "A healthy outside starts from a healthy inside."
+        )
+
+        val randomTip = wellnessTips.random()
+        binding.textWellness.text = "Daily Wellness Fact: $randomTip"
     }
 
     private fun setupHospitalDashboard() {
