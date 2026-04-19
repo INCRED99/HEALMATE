@@ -55,19 +55,23 @@ class RecordsFragment : Fragment() {
     private fun fetchRecords() {
         val uid = auth.currentUser?.uid ?: return
         
-        db.collection("users").document(uid).collection("medical_records")
+        db.collection("users").document(uid).collection("records")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { snapshot ->
                 records.clear()
                 if (snapshot.isEmpty) {
-                    Toast.makeText(context, "No medical records found", Toast.LENGTH_SHORT).show()
+                    // It's empty initially as requested
                 } else {
                     for (doc in snapshot.documents) {
-                        val title = doc.getString("title") ?: "Appointment"
+                        val hospitalName = doc.getString("hospitalName") ?: "Hospital"
                         val date = doc.getString("date") ?: ""
-                        val details = doc.getString("details") ?: ""
-                        records.add(MedicalRecord(title, date, details))
+                        val slot = doc.getString("slot") ?: ""
+                        val prescription = doc.getString("prescription") ?: "No prescription provided."
+                        
+                        // Reflect Hospital Name, Date, and Time in the list
+                        val displayDate = "$date at $slot"
+                        records.add(MedicalRecord(hospitalName, displayDate, prescription))
                     }
                 }
                 adapter.notifyDataSetChanged()
@@ -95,12 +99,15 @@ class RecordsFragment : Fragment() {
             val record = recordList[position]
             holder.textTitle.text = record.title
             holder.textDate.text = record.date
-            holder.textDetails.text = record.details
+            
+            // Prescription data is hidden from the list view
+            holder.textDetails.visibility = View.GONE
 
             holder.root.setOnClickListener {
+                // Prescriptions only visible when clicked
                 com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                     .setTitle(record.title)
-                    .setMessage("Date: ${record.date}\n\nDetails:\n${record.details}")
+                    .setMessage("Date: ${record.date}\n\nPrescription:\n${record.details}")
                     .setPositiveButton("Close", null)
                     .show()
             }

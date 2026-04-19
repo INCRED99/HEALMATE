@@ -45,6 +45,24 @@ class CommunityFragment : Fragment() {
         binding.buttonSend.setOnClickListener {
             sendMessage()
         }
+
+        binding.editMessage.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && messages.isNotEmpty()) {
+                binding.recyclerChat.postDelayed({
+                    binding.recyclerChat.smoothScrollToPosition(messages.size - 1)
+                }, 200)
+            }
+        }
+    }
+
+    private fun markMessageAsSeen(messageId: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val userName = auth.currentUser?.displayName ?: "User"
+        val timeNow = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+        
+        val seenPath = "seenBy.$userId"
+        db.collection("global_community").document(messageId)
+            .update(seenPath, "$userName at $timeNow")
     }
 
     private fun setupChat() {
@@ -70,13 +88,22 @@ class CommunityFragment : Fragment() {
                 if (snapshot != null) {
                     messages.clear()
                     for (doc in snapshot.documents) {
+                        val msgId = doc.id
                         val text = doc.getString("message") ?: ""
                         val senderName = doc.getString("senderName") ?: "Anonymous"
                         val senderId = doc.getString("senderId") ?: ""
                         val time = doc.getString("timeString") ?: ""
+                        val seenBy = doc.get("seenBy") as? Map<String, String> ?: emptyMap()
                         
                         val isSentByMe = senderId == auth.currentUser?.uid
-                        messages.add(ChatMessage(text, senderName, time, isSentByMe))
+                        
+                        val message = ChatMessage(msgId, text, senderName, senderId, time, isSentByMe, null, seenBy)
+                        messages.add(message)
+
+                        // Mark as seen if it's not our own message
+                        if (!isSentByMe && !seenBy.containsKey(auth.currentUser?.uid)) {
+                            markMessageAsSeen(msgId)
+                        }
                     }
                     chatAdapter.notifyDataSetChanged()
                     scrollToBottom()
@@ -89,14 +116,17 @@ class CommunityFragment : Fragment() {
         if (text.isEmpty()) return
 
         val user = auth.currentUser
+        val userId = user?.uid ?: "unknown"
+        val senderName = user?.displayName ?: "User"
         val timeString = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         
         val messageData = hashMapOf(
             "message" to text,
-            "senderName" to (user?.displayName ?: "User"),
-            "senderId" to (user?.uid ?: "unknown"),
+            "senderName" to senderName,
+            "senderId" to userId,
             "timeString" to timeString,
-            "timestamp" to com.google.firebase.Timestamp.now()
+            "timestamp" to com.google.firebase.Timestamp.now(),
+            "seenBy" to mapOf(userId to "$senderName at $timeString")
         )
 
         binding.editMessage.text?.clear()

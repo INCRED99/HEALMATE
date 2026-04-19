@@ -66,7 +66,25 @@ class GroupChatFragment : Fragment() {
         binding.buttonGroupSend.setOnClickListener { sendTextMessage() }
         binding.buttonAttach.setOnClickListener { openImagePicker() }
 
+        binding.editGroupMessage.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && messages.isNotEmpty()) {
+                binding.recyclerGroupChat.postDelayed({
+                    binding.recyclerGroupChat.smoothScrollToPosition(messages.size - 1)
+                }, 200)
+            }
+        }
+
         loadRealMessages()
+    }
+
+    private fun markMessageAsSeen(messageId: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val userName = auth.currentUser?.displayName ?: "User"
+        val timeNow = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+        
+        val seenPath = "seenBy.$userId"
+        db.collection("groups").document(groupId).collection("messages").document(messageId)
+            .update(seenPath, "$userName at $timeNow")
     }
 
     private fun setupChat() {
@@ -85,13 +103,23 @@ class GroupChatFragment : Fragment() {
                 if (snapshot != null) {
                     messages.clear()
                     for (doc in snapshot.documents) {
+                        val msgId = doc.id
                         val text = doc.getString("message") ?: ""
                         val senderName = doc.getString("senderName") ?: "User"
                         val senderId = doc.getString("senderId") ?: ""
                         val time = doc.getString("timeString") ?: ""
                         val imageUrl = doc.getString("imageUrl")
+                        val seenBy = doc.get("seenBy") as? Map<String, String> ?: emptyMap()
+                        
                         val isSentByMe = senderId == auth.currentUser?.uid
-                        messages.add(ChatMessage(text, senderName, time, isSentByMe, imageUrl))
+                        
+                        val message = ChatMessage(msgId, text, senderName, senderId, time, isSentByMe, imageUrl, seenBy)
+                        messages.add(message)
+                        
+                        // Mark as seen if it's not our own message
+                        if (!isSentByMe && !seenBy.containsKey(auth.currentUser?.uid)) {
+                            markMessageAsSeen(msgId)
+                        }
                     }
                     chatAdapter.notifyDataSetChanged()
                     if (messages.isNotEmpty()) {
@@ -107,18 +135,18 @@ class GroupChatFragment : Fragment() {
 
         val timeString = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         val user = auth.currentUser
-        val senderName = user?.displayName?.takeIf { it.isNotEmpty() }
-            ?: user?.email?.substringBefore("@") ?: "User"
-        val senderId = user?.uid ?: ""
+        val userId = user?.uid ?: ""
+        val senderName = user?.displayName?.takeIf { it.isNotBlank() } ?: user?.email?.substringBefore("@") ?: "User"
 
         val messageData = hashMapOf(
             "message" to text,
             "senderName" to senderName,
-            "senderId" to senderId,
+            "senderId" to userId,
             "timeString" to timeString,
-            "timestamp" to Timestamp.now()
+            "timestamp" to com.google.firebase.Timestamp.now(),
+            "imageUrl" to imageUrl,
+            "seenBy" to mapOf(userId to "$senderName at $timeString")
         )
-        if (imageUrl != null) messageData["imageUrl"] = imageUrl
 
         db.collection("groups").document(groupId).collection("messages").add(messageData)
         binding.editGroupMessage.text.clear()

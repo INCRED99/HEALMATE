@@ -42,6 +42,22 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
         } else if (holder is ReceivedViewHolder) {
             holder.bind(message)
         }
+
+        holder.itemView.setOnLongClickListener {
+            if (!message.isSent) return@setOnLongClickListener false
+            
+            val context = holder.itemView.context
+            // Filter out the sender's own "seen" entry to show only other people who saw it
+            val othersWhoSaw = message.seenBy.filterKeys { it != message.senderId }
+            val seenList = othersWhoSaw.values.joinToString("\n") { "• $it" }
+            
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
+                .setTitle("Message Info")
+                .setMessage("Seen by:\n${if (seenList.isNotEmpty()) seenList else "No one yet"}")
+                .setPositiveButton("OK", null)
+                .show()
+            true
+        }
     }
 
     override fun getItemCount() = messages.size

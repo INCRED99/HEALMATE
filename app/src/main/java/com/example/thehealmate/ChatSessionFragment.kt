@@ -66,6 +66,16 @@ class ChatSessionFragment : Fragment() {
         }
     }
 
+    private fun markMessageAsSeen(chatId: String, messageId: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val userName = auth.currentUser?.displayName ?: "User"
+        val timeNow = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+        
+        val seenPath = "seenBy.$userId"
+        db.collection("chats").document(chatId).collection("messages").document(messageId)
+            .update(seenPath, "$userName at $timeNow")
+    }
+
     private fun loadRealMessages() {
         val user = auth.currentUser
         val userId = user?.uid ?: "unknown"
@@ -81,13 +91,23 @@ class ChatSessionFragment : Fragment() {
                 if (snapshot != null) {
                     messages.clear()
                     for (doc in snapshot.documents) {
+                        val msgId = doc.id
                         val text = doc.getString("message") ?: ""
                         val senderName = doc.getString("senderName") ?: "User"
                         val senderId = doc.getString("senderId") ?: ""
                         val time = doc.getString("timeString") ?: ""
+                        val imageUrl = doc.getString("imageUrl")
+                        val seenBy = doc.get("seenBy") as? Map<String, String> ?: emptyMap()
                         
                         val isSentByMe = senderId == auth.currentUser?.uid
-                        messages.add(ChatMessage(text, senderName, time, isSentByMe))
+                        
+                        val message = ChatMessage(msgId, text, senderName, senderId, time, isSentByMe, imageUrl, seenBy)
+                        messages.add(message)
+
+                        // Mark as seen if it's not our own message
+                        if (!isSentByMe && !seenBy.containsKey(auth.currentUser?.uid)) {
+                            markMessageAsSeen(chatId, msgId)
+                        }
                     }
                     chatAdapter.notifyDataSetChanged()
                     if (messages.isNotEmpty()) {
@@ -111,7 +131,8 @@ class ChatSessionFragment : Fragment() {
             "senderName" to senderName,
             "senderId" to senderId,
             "timeString" to timeString,
-            "timestamp" to com.google.firebase.Timestamp.now()
+            "timestamp" to com.google.firebase.Timestamp.now(),
+            "seenBy" to mapOf(senderId to "$senderName at $timeString")
         )
 
         val chatId = "${senderId}_${doctorName.replace(" ", "_")}"

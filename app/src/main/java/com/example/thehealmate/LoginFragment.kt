@@ -79,14 +79,15 @@ class LoginFragment : Fragment() {
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val isHospital = binding.radioHospital.isChecked
         auth.signInWithCredential(credential)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    saveUserToFirestore(user?.uid, user?.displayName, user?.email)
+                    saveUserToFirestore(user?.uid, user?.displayName, user?.email, isHospital)
                     
                     val bundle = Bundle().apply {
-                        putBoolean("isHospital", false)
+                        putBoolean("isHospital", isHospital)
                     }
                     findNavController().navigate(R.id.action_LoginFragment_to_FirstFragment, bundle)
                 } else {
@@ -95,14 +96,15 @@ class LoginFragment : Fragment() {
             }
     }
 
-    private fun saveUserToFirestore(uid: String?, name: String?, email: String?) {
+    private fun saveUserToFirestore(uid: String?, name: String?, email: String?, isHospital: Boolean) {
         if (uid == null) return
         val db = FirebaseFirestore.getInstance()
+        val role = if (isHospital) "hospital" else "patient"
         val userMap = hashMapOf(
             "uid" to uid,
             "name" to name,
             "email" to email,
-            "role" to "patient",
+            "role" to role,
             "lastLogin" to com.google.firebase.Timestamp.now()
         )
         db.collection("users").document(uid).set(userMap, SetOptions.merge())
