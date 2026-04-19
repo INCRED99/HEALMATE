@@ -1,17 +1,45 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Force light theme even in night mode - no dark cards -->
+    <!-- Reverting dark theme to light properties as requested -->
     <style name="Base.Theme.Thehealmate" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primary_medical</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/surface_tint</item>
+        <item name="colorPrimaryContainer">@color/primary_light</item>
         <item name="colorOnPrimaryContainer">@color/primary_dark</item>
+
+        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnSurface">@color/text_dark</item>
-        <item name="colorSurfaceVariant">@color/surface_tint</item>
-        <item name="colorError">@color/error_red</item>
-        <item name="android:statusBarColor">@color/primary_medical</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/accent</item>
+        <item name="colorOnSecondaryContainer">@color/black</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Customize your theme here. -->
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="isLightTheme">true</item>
+
+        <!-- Bridge Material 2 to Material 3 Typography -->
+        <item name="textAppearanceHeadline1">?attr/textAppearanceHeadlineLarge</item>
+        <item name="textAppearanceHeadline2">?attr/textAppearanceHeadlineLarge</item>
+        <item name="textAppearanceHeadline3">?attr/textAppearanceHeadlineMedium</item>
+        <item name="textAppearanceHeadline4">?attr/textAppearanceHeadlineMedium</item>
+        <item name="textAppearanceHeadline5">?attr/textAppearanceHeadlineSmall</item>
+        <item name="textAppearanceHeadline6">?attr/textAppearanceTitleLarge</item>
+        <item name="textAppearanceSubtitle1">?attr/textAppearanceTitleMedium</item>
+        <item name="textAppearanceSubtitle2">?attr/textAppearanceTitleSmall</item>
+        <item name="textAppearanceBody1">?attr/textAppearanceBodyLarge</item>
+        <item name="textAppearanceBody2">?attr/textAppearanceBodyMedium</item>
+        <item name="textAppearanceCaption">?attr/textAppearanceLabelSmall</item>
+        <item name="textAppearanceButton">?attr/textAppearanceLabelLarge</item>
+        <item name="textAppearanceOverline">?attr/textAppearanceLabelSmall</item>
+
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
     </style>
 </resources>

@@ -36,6 +36,8 @@ class GroupChatFragment : Fragment() {
     private val defaultGroupMessageHint = "Share with the group..."
     private var replyToMessage: ChatMessage? = null
     private var currentUserName: String = "User"
+    private var isNameResolved = false
+    private val pendingSeenMessages = mutableSetOf<String>()
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -84,6 +86,10 @@ class GroupChatFragment : Fragment() {
     }
 
     private fun markMessageAsSeen(messageId: String) {
+        if (!isNameResolved) {
+            pendingSeenMessages.add(messageId)
+            return
+        }
         val userId = auth.currentUser?.uid ?: return
         val userName = currentUserName.ifBlank { "User" }
         val timeNow = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
@@ -93,11 +99,26 @@ class GroupChatFragment : Fragment() {
             .update(seenPath, "$userName at $timeNow")
     }
 
+    private fun processPendingSeenMessages() {
+        if (pendingSeenMessages.isEmpty()) return
+        val toMark = pendingSeenMessages.toList()
+        pendingSeenMessages.clear()
+        toMark.forEach { markMessageAsSeen(it) }
+    }
+
     private fun resolveCurrentUserName() {
         val user = auth.currentUser ?: return
-        currentUserName = user.displayName?.takeIf { it.isNotBlank() }
+        
+        val fallbackName = user.displayName?.takeIf { it.isNotBlank() }
             ?: user.email?.substringBefore("@")
             ?: "User"
+            
+        currentUserName = fallbackName
+        
+        if (fallbackName != "User") {
+            isNameResolved = true
+            processPendingSeenMessages()
+        }
 
         db.collection("users").document(user.uid).get()
             .addOnSuccessListener { doc ->
@@ -105,14 +126,31 @@ class GroupChatFragment : Fragment() {
                 if (profileName.isNotEmpty()) {
                     currentUserName = profileName
                 }
+                isNameResolved = true
+                processPendingSeenMessages()
+            }
+            .addOnFailureListener {
+                isNameResolved = true
+                processPendingSeenMessages()
             }
     }
 
     private fun setupChat() {
         chatAdapter = ChatAdapter(messages)
         binding.recyclerGroupChat.apply {
-            layoutManager = LinearLayoutManager(context).apply { stackFromEnd = true }
+            val llm = LinearLayoutManager(context).apply { stackFromEnd = true }
+            layoutManager = llm
             adapter = chatAdapter
+            
+            addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
+                if (bottom < oldBottom) {
+                    postDelayed({
+                        if (messages.isNotEmpty()) {
+                            smoothScrollToPosition(messages.size - 1)
+                        }
+                    }, 100)
+                }
+            }
         }
         attachSwipeToReply()
     }
@@ -195,13 +233,19 @@ class GroupChatFragment : Fragment() {
                     }
                     chatAdapter.notifyDataSetChanged()
                     if (messages.isNotEmpty()) {
-                        binding.recyclerGroupChat.scrollToPosition(messages.size - 1)
+                        binding.recyclerGroupChat.post {
+                            binding.recyclerGroupChat.smoothScrollToPosition(messages.size - 1)
+                        }
                     }
                 }
             }
     }
 
     private fun sendTextMessage(imageUrl: String? = null) {
+        if (!isNameResolved) {
+            Toast.makeText(context, "Resolving profile...", Toast.LENGTH_SHORT).show()
+            return
+        }
         val rawText = binding.editGroupMessage.text.toString().trim()
         val replyPrefix = replyToMessage?.let { buildReplyPrefix(it) }
         val text = when {

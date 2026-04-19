@@ -119,34 +119,51 @@ class RegisterFragment : Fragment() {
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
         val confirmPassword = binding.inputConfirmPassword.text.toString()
+        val emergencyContact = binding.inputEmergencyContact.text.toString().trim()
 
         // Reset errors
         binding.inputNameLayout.error = null
         binding.inputEmailLayout.error = null
         binding.inputPasswordLayout.error = null
         binding.inputConfirmPasswordLayout.error = null
+        binding.inputEmergencyContactLayout.error = null
 
-        // Name validation
+        // Name validation: Check for symbols
         if (name.isEmpty()) {
-            binding.inputNameLayout.error = getString(R.string.error_name_empty)
+            binding.inputNameLayout.error = "Name cannot be empty"
+            return false
+        }
+        if (!name.all { it.isLetter() || it.isWhitespace() }) {
+            binding.inputNameLayout.error = "Name should not contain symbols or numbers"
             return false
         }
 
-        // Email validation
+        // Email validation: Missing domain/gmail/etc
+        val emailPattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"
         if (email.isEmpty()) {
-            binding.inputEmailLayout.error = getString(R.string.error_email_empty)
+            binding.inputEmailLayout.error = "Email cannot be empty"
+            return false
+        }
+        if (!email.matches(emailPattern.toRegex())) {
+            binding.inputEmailLayout.error = "Invalid email: Check for @, domain, and extension"
             return false
         }
 
         // Password validation
         if (password.length < 6) {
-            binding.inputPasswordLayout.error = getString(R.string.error_password_short)
+            binding.inputPasswordLayout.error = "Password must be at least 6 characters"
             return false
         }
 
         // Confirm password
         if (confirmPassword != password) {
-            binding.inputConfirmPasswordLayout.error = getString(R.string.error_password_mismatch)
+            binding.inputConfirmPasswordLayout.error = "Passwords do not match"
+            return false
+        }
+
+        // Emergency Contact validation: Exactly 10 digits
+        if (emergencyContact.length != 10 || !emergencyContact.all { it.isDigit() }) {
+            binding.inputEmergencyContactLayout.error = "Emergency contact must be exactly 10 digits"
             return false
         }
 
@@ -157,6 +174,7 @@ class RegisterFragment : Fragment() {
         val name = binding.inputName.text.toString().trim()
         val email = binding.inputEmail.text.toString().trim()
         val password = binding.inputPassword.text.toString()
+        val emergencyContact = binding.inputEmergencyContact.text.toString().trim()
         val isHospital = binding.radioHospital.isChecked
         val role = if (isHospital) "hospital" else "patient"
 
@@ -165,7 +183,7 @@ class RegisterFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     val uid = auth.currentUser?.uid
-                    saveUserToFirestore(uid, name, email, role, "")
+                    saveUserToFirestore(uid, name, email, role, emergencyContact)
                     
                     Toast.makeText(context, getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
                     findNavController().navigate(R.id.action_RegisterFragment_to_LoginFragment)

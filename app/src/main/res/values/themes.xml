@@ -1,39 +1,66 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.HealMate" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Thehealmate" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primary_medical</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/primary_light</item>
+        <item name="colorOnPrimaryContainer">@color/primary_dark</item>
+
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorSecondaryVariant">@color/accent</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/accent</item>
+        <item name="colorOnSecondaryContainer">@color/black</item>
+
         <!-- Status bar color. -->
         <item name="android:statusBarColor">#FFFFFF</item>
         <item name="android:windowLightStatusBar">true</item>
+
         <!-- Customize your theme here. -->
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowBackground">@color/background_light</item>
         <item name="android:fontFamily">sans-serif</item>
+        <item name="isLightTheme">true</item>
+
+        <!-- Bridge Material 2 to Material 3 Typography -->
+        <item name="textAppearanceHeadline1">?attr/textAppearanceHeadlineLarge</item>
+        <item name="textAppearanceHeadline2">?attr/textAppearanceHeadlineLarge</item>
+        <item name="textAppearanceHeadline3">?attr/textAppearanceHeadlineMedium</item>
+        <item name="textAppearanceHeadline4">?attr/textAppearanceHeadlineMedium</item>
+        <item name="textAppearanceHeadline5">?attr/textAppearanceHeadlineSmall</item>
+        <item name="textAppearanceHeadline6">?attr/textAppearanceTitleLarge</item>
+        <item name="textAppearanceSubtitle1">?attr/textAppearanceTitleMedium</item>
+        <item name="textAppearanceSubtitle2">?attr/textAppearanceTitleSmall</item>
+        <item name="textAppearanceBody1">?attr/textAppearanceBodyLarge</item>
+        <item name="textAppearanceBody2">?attr/textAppearanceBodyMedium</item>
+        <item name="textAppearanceCaption">?attr/textAppearanceLabelSmall</item>
+        <item name="textAppearanceButton">?attr/textAppearanceLabelLarge</item>
+        <item name="textAppearanceOverline">?attr/textAppearanceLabelSmall</item>
+
+        <!-- Bridge Material 2 to Material 3 Colors -->
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
     </style>
+
+    <style name="Theme.Thehealmate" parent="Base.Theme.Thehealmate" />
 
     <style name="CustomAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="shapeAppearanceMediumComponent">@style/RoundedCorners</item>
     </style>
 
-    <style name="RoundedCorners" parent="ShapeAppearance.Material3.Corner.Medium">
+    <style name="RoundedCorners">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">24dp</item>
     </style>
 
-    <style name="CircleImage" parent="">
+    <style name="CircleImage">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 
-    <style name="bg_badge_white" parent="">
+    <style name="bg_badge_white">
         <item name="android:background">@drawable/bg_badge_white</item>
     </style>
 

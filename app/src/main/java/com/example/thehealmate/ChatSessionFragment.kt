@@ -28,6 +28,9 @@ class ChatSessionFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private var messageListener: ListenerRegistration? = null
     private var doctorName = "Doctor"
+    private var currentUserName = "User"
+    private var isNameResolved = false
+    private val pendingSeenMessages = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +45,7 @@ class ChatSessionFragment : Fragment() {
 
         doctorName = arguments?.getString("doctorName") ?: "Doctor"
         binding.textChatDoctorName.text = doctorName
+        resolveCurrentUserName()
 
         setupChat()
 
@@ -67,13 +71,58 @@ class ChatSessionFragment : Fragment() {
     }
 
     private fun markMessageAsSeen(chatId: String, messageId: String) {
+        if (!isNameResolved) {
+            pendingSeenMessages.add(messageId)
+            return
+        }
         val userId = auth.currentUser?.uid ?: return
-        val userName = auth.currentUser?.displayName ?: "User"
+        val userName = currentUserName.ifBlank { "User" }
         val timeNow = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         
         val seenPath = "seenBy.$userId"
         db.collection("chats").document(chatId).collection("messages").document(messageId)
             .update(seenPath, "$userName at $timeNow")
+    }
+
+    private fun processPendingSeenMessages() {
+        if (pendingSeenMessages.isEmpty()) return
+        val toMark = pendingSeenMessages.toList()
+        pendingSeenMessages.clear()
+        
+        val user = auth.currentUser
+        val userId = user?.uid ?: "unknown"
+        val chatId = "${userId}_${doctorName.replace(" ", "_")}"
+        
+        toMark.forEach { markMessageAsSeen(chatId, it) }
+    }
+
+    private fun resolveCurrentUserName() {
+        val user = auth.currentUser ?: return
+        
+        val fallbackName = user.displayName?.takeIf { it.isNotBlank() }
+            ?: user.email?.substringBefore("@")
+            ?: "User"
+            
+        currentUserName = fallbackName
+        
+        if (fallbackName != "User") {
+            isNameResolved = true
+            processPendingSeenMessages()
+        }
+
+        db.collection("users").document(user.uid).get()
+            .addOnSuccessListener { doc ->
+                val profileName = doc.getString("name")?.trim().orEmpty()
+                if (profileName.isNotEmpty()) {
+                    currentUserName = profileName
+                }
+                isNameResolved = true
+                processPendingSeenMessages()
+            }
+            .addOnFailureListener {
+                isNameResolved = true
+                processPendingSeenMessages()
+            }
     }
 
     private fun loadRealMessages() {
@@ -118,12 +167,16 @@ class ChatSessionFragment : Fragment() {
     }
 
     private fun sendMessage() {
+        if (!isNameResolved) {
+            Toast.makeText(context, "Resolving profile...", Toast.LENGTH_SHORT).show()
+            return
+        }
         val text = binding.editChatMessage.text.toString().trim()
         if (text.isEmpty()) return
 
         val timeString = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         val user = auth.currentUser
-        val senderName = user?.displayName ?: "Patient"
+        val senderName = currentUserName
         val senderId = user?.uid ?: "unknown"
 
         val messageData = hashMapOf(

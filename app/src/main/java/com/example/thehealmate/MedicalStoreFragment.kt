@@ -13,12 +13,29 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.thehealmate.databinding.FragmentMedicalStoreBinding
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.content.Context
+import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts
+
 data class MedicalStore(val name: String, val location: String)
 
 class MedicalStoreFragment : Fragment() {
 
     private var _binding: FragmentMedicalStoreBinding? = null
     private val binding get() = _binding!!
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            checkGpsAndShowStores()
+        } else {
+            Toast.makeText(context, "GPS required for medical stores", Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMedicalStoreBinding.inflate(inflater, container, false)
@@ -27,6 +44,26 @@ class MedicalStoreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        checkGpsAndShowStores()
+    }
+
+    private fun checkGpsAndShowStores() {
+        val fineLocationPermission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+        
+        if (fineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            return
+        }
+
+        val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+
+        if (!isGpsEnabled) {
+            Toast.makeText(context, "Please turn on GPS/Location to see nearby medical stores", Toast.LENGTH_LONG).show()
+            // We can still show the list, but with a warning, or show an empty state. 
+            // The prompt said: if gps is off, the app should ask for gps permissions.
+            // Note: App cannot "turn on" GPS automatically, but it can prompt.
+        }
 
         val stores = listOf(
             MedicalStore("Nagpur Central Pharmacy", "Dharampeth, Nagpur"),

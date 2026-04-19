@@ -121,21 +121,34 @@ class LoginFragment : Fragment() {
         binding.inputEmailLayout.error = null
         binding.inputPasswordLayout.error = null
 
-        if (email.isEmpty()) {
-            binding.inputEmailLayout.error = getString(R.string.error_email_empty)
+        // Internet check
+        if (!isNetworkAvailable()) {
+            Toast.makeText(context, "Internet is off. Please check your connection.", Toast.LENGTH_LONG).show()
             return false
         }
-        if (!email.contains("@")) {
-            binding.inputEmailLayout.error = getString(R.string.error_email_invalid)
+
+        val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
+        if (email.isEmpty()) {
+            binding.inputEmailLayout.error = "Email cannot be empty"
+            return false
+        }
+        if (!email.matches(emailPattern.toRegex())) {
+            binding.inputEmailLayout.error = "Invalid email format (missing @ or domain)"
             return false
         }
 
         if (password.isEmpty()) {
-            binding.inputPasswordLayout.error = getString(R.string.error_password_empty)
+            binding.inputPasswordLayout.error = "Password cannot be empty"
             return false
         }
 
         return true
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetworkInfo
+        return activeNetwork != null && activeNetwork.isConnected
     }
 
     private fun attemptLogin() {

@@ -12,8 +12,18 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.Locale
 
-class ChatAdapter(private val messages: List<ChatMessage>) :
+class ChatAdapter(private var messages: List<ChatMessage>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    fun updateMessages(newMessages: List<ChatMessage>) {
+        val oldSize = messages.size
+        messages = newMessages
+        if (newMessages.size > oldSize) {
+            notifyItemRangeInserted(oldSize, newMessages.size - oldSize)
+        } else {
+            notifyDataSetChanged()
+        }
+    }
 
     companion object {
         private const val VIEW_TYPE_SENT = 1

@@ -114,10 +114,22 @@ class CommunityFragment : Fragment() {
     private fun setupChat() {
         chatAdapter = ChatAdapter(messages)
         binding.recyclerChat.apply {
-            layoutManager = LinearLayoutManager(context).apply {
+            val llm = LinearLayoutManager(context).apply {
                 stackFromEnd = true
             }
+            layoutManager = llm
             adapter = chatAdapter
+            
+            // Force scroll to bottom on layout change (keyboard up/down)
+            addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
+                if (bottom < oldBottom) {
+                    postDelayed({
+                        if (messages.isNotEmpty()) {
+                            smoothScrollToPosition(messages.size - 1)
+                        }
+                    }, 100)
+                }
+            }
         }
         attachSwipeToReply()
     }
@@ -213,6 +225,11 @@ class CommunityFragment : Fragment() {
     }
 
     private fun sendMessage() {
+        if (!isNameResolved) {
+            Toast.makeText(context, "Please wait, resolving your profile...", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val rawText = binding.editMessage.text.toString().trim()
         if (rawText.isEmpty()) return
 
@@ -220,7 +237,7 @@ class CommunityFragment : Fragment() {
 
         val user = auth.currentUser
         val userId = user?.uid ?: "unknown"
-        val senderName = currentUserName.ifBlank { "User" }
+        val senderName = currentUserName
         val timeString = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         
         val messageData = hashMapOf(

@@ -21,6 +21,8 @@ import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
+import androidx.activity.result.contract.ActivityResultContracts
+
 class FirstFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
@@ -31,6 +33,38 @@ class FirstFragment : Fragment() {
     private val prefsName = "healmate_prefs"
     private val dailyFactUserKey = "daily_fact_user_id"
     private val dailyFactTextKey = "daily_fact_text"
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+        val smsGranted = permissions[Manifest.permission.SEND_SMS] ?: false
+
+        if (!fineLocationGranted && !coarseLocationGranted) {
+            Toast.makeText(context, "GPS required for medical stores and nearby help.", Toast.LENGTH_LONG).show()
+        }
+        if (!smsGranted) {
+            Toast.makeText(context, "SMS permission needed for emergency alerts.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun checkAndRequestPermissions() {
+        val permissionsToRequest = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.SEND_SMS)
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            requestPermissionLauncher.launch(permissionsToRequest.toTypedArray())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +81,9 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // FORCE PERMISSION CHECK IMMEDIATELY ON LOGIN
+        checkAndRequestPermissions()
 
         val isHospital = arguments?.getBoolean("isHospital") ?: false
         
